@@ -20,14 +20,11 @@
         .game-container { display: flex; flex-direction: column; height: 100vh; }
         .side { flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
 
-        /* GUESSER SIDE */
         #guesser-side { background: #1e1b4b; transform: rotate(180deg); border-bottom: 2px solid rgba(255,255,255,0.1); }
-        #hint-display { font-size: 1.2rem; color: var(--warning); font-weight: bold; margin-top: 10px; min-height: 1.5rem; }
+        #hint-display { font-size: 1.2rem; color: var(--warning); font-weight: bold; margin-top: 10px; min-height: 1.5rem; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-        /* HOST SIDE */
         #host-side { background: #0f172a; }
 
-        /* PEEK AREA */
         #peek-area { 
             background: var(--card); padding: 12px 24px; border-radius: 50px;
             margin-bottom: 15px; border: 1px solid var(--accent); 
@@ -35,11 +32,9 @@
         }
         #secret-word-display { opacity: 0; color: var(--warning); font-weight: 800; margin-left: 10px; transition: opacity 0.1s; }
         
-        /* Stats */
         .badge { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin: 5px; border: 1px solid rgba(255,255,255,0.1); }
-        #last-answer { font-size: 4.5rem; font-weight: 900; margin: 5px; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        #last-answer { font-size: 4.5rem; font-weight: 900; margin: 5px; text-shadow: 0 0 20px rgba(255,255,255,0.1); text-align: center; }
 
-        /* Controls */
         .controls { width: 95%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .ans-btn { padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.1s; }
         .ans-btn:active { transform: scale(0.95); }
@@ -49,7 +44,6 @@
         .win-btn { grid-column: span 2; background: var(--accent); font-size: 1.1rem; }
         .util-btn { grid-column: span 1; background: #334155; font-size: 0.8rem; }
 
-        /* Overlays */
         .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         input { background: var(--card); border: 2px solid var(--accent); color: white; padding: 18px; width: 260px; border-radius: 16px; font-size: 1.2rem; margin: 10px; text-align: center; outline: none; }
         .primary-btn { background: var(--accent); color: white; padding: 16px 50px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
@@ -92,7 +86,7 @@
             <button class="ans-btn depends" onclick="handleAns('DEPENDS', '#3b82f6')">DEPENDS</button>
             
             <button class="ans-btn win-btn" onclick="endGame(true)">🏆 YOU GOT IT!</button>
-            <button class="ans-btn util-btn" onclick="giveHint()">HINT</button>
+            <button class="ans-btn util-btn" onclick="giveHint()" style="color: var(--warning)">HINT (-5)</button>
             
             <button class="ans-btn util-btn" style="grid-column: span 1.5;" onclick="undo()">UNDO</button>
             <button class="ans-btn util-btn" style="grid-column: span 1.5;" onclick="location.reload()">RESET</button>
@@ -109,12 +103,7 @@
     function startGame() {
         const input = document.getElementById('wordInput');
         const word = input.value.trim().toUpperCase();
-        
-        if (!word) {
-            alert("Please type a secret word first!");
-            return;
-        }
-
+        if (!word) return alert("Please type a secret word first!");
         secret = word;
         document.getElementById('secret-word-display').innerText = secret;
         document.getElementById('finalWordDisplay').innerText = secret;
@@ -127,35 +116,43 @@
 
     function handleAns(ans, color) {
         if (count <= 0) return;
-
-        // Save for undo
-        history.push({
-            ans: document.getElementById('last-answer').innerText,
-            color: document.getElementById('last-answer').style.color,
-            count: count
-        });
-
+        saveHistory();
         count--;
         updateUI(ans, color);
-        if (count === 0) endGame(false);
+        if (count <= 0) endGame(false);
     }
 
     function giveHint() {
-        const hint = prompt("Type a one-word hint for the guesser:");
+        if (count < 5) return alert("Not enough questions left! A hint costs 5 questions.");
+        const hint = prompt("Type a one-word hint (Costs 5 Questions):");
         if (hint) {
+            saveHistory();
+            count -= 5;
             document.getElementById('hint-display').innerText = "HINT: " + hint.toUpperCase();
+            updateUI("HINT GIVEN", "var(--warning)");
+            if (count <= 0 && document.getElementById('victory').classList.contains('hidden')) endGame(false);
         }
+    }
+
+    function saveHistory() {
+        history.push({
+            ans: document.getElementById('last-answer').innerText,
+            color: document.getElementById('last-answer').style.color,
+            count: count,
+            hint: document.getElementById('hint-display').innerText
+        });
     }
 
     function undo() {
         if (history.length === 0) return;
         const last = history.pop();
         count = last.count;
+        document.getElementById('hint-display').innerText = last.hint;
         updateUI(last.ans, last.color);
     }
 
     function updateUI(ans, color) {
-        document.querySelectorAll('.q-val').forEach(e => e.innerText = count);
+        document.querySelectorAll('.q-val').forEach(e => e.innerText = Math.max(0, count));
         const disp = document.getElementById('last-answer');
         disp.innerText = ans;
         disp.style.color = color;
@@ -165,6 +162,9 @@
         if (!won) {
             document.getElementById('winStatus').innerText = "GAME OVER";
             document.getElementById('winStatus').style.color = "var(--danger)";
+        } else {
+            document.getElementById('winStatus').innerText = "VICTORY";
+            document.getElementById('winStatus').style.color = "var(--success)";
         }
         document.getElementById('victory').classList.remove('hidden');
     }
