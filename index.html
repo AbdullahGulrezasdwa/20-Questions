@@ -12,153 +12,141 @@
             --success: #22c55e;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --info: #3b82f6; /* Color for Depends */
             --text: #f8fafc;
         }
 
         body, html { 
             margin: 0; padding: 0; height: 100%; 
-            font-family: 'Inter', -apple-system, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             overflow: hidden; background: var(--bg); color: var(--text);
+            user-select: none; -webkit-user-select: none;
         }
 
         .game-container { display: flex; flex-direction: column; height: 100vh; }
 
-        /* General Side Styling */
         .side { 
             flex: 1; padding: 20px; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Guesser Side (Top) */
         #guesser-side { 
             background: linear-gradient(to bottom, #1e1b4b, #0f172a);
             transform: rotate(180deg);
             border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
-        /* Host Side (Bottom) */
         #host-side { background: linear-gradient(to top, #111827, #0f172a); }
 
-        /* ANTI-SELECTION & PEEK LOGIC */
+        /* Anti-Selection Peek Area */
         #peek-area { 
             background: rgba(255, 255, 255, 0.05);
             padding: 12px 24px; border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer; margin-bottom: 25px;
-            user-select: none; /* Prevents text selection */
-            -webkit-user-select: none;
-            -webkit-touch-callout: none; /* Prevents "save image" menu on mobile */
+            cursor: pointer; margin-bottom: 20px;
+            -webkit-touch-callout: none;
         }
 
         #secret-word-display { 
             display: none; color: var(--warning); 
             font-weight: 800; margin-left: 10px;
-            pointer-events: none; /* User can't click/select the word itself */
+            pointer-events: none;
         }
         #peek-area:active #secret-word-display { display: inline; }
-        #peek-area:active { background: rgba(255, 255, 255, 0.1); transform: scale(0.98); }
 
-        /* Answer Display */
         #last-answer { 
-            font-size: 5rem; font-weight: 900; margin: 10px;
+            font-size: 4.5rem; font-weight: 900; margin: 10px;
             text-transform: uppercase; letter-spacing: -2px;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
+            text-align: center;
         }
 
         .counter-badge {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--accent); padding: 4px 12px;
-            border-radius: 20px; font-weight: bold; font-size: 0.9rem;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent); padding: 6px 16px;
+            border-radius: 20px; font-weight: bold;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
-        /* Modern Buttons */
-        .controls { width: 90%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        /* Responsive Grid for 4 buttons + Win button */
+        .controls { width: 95%; max-width: 450px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .ans-btn { 
-            padding: 18px; border: none; border-radius: 16px; 
+            padding: 16px; border: none; border-radius: 12px; 
             font-size: 1rem; font-weight: 700; cursor: pointer; color: white;
-            transition: all 0.2s;
+            transition: transform 0.1s;
         }
-        .ans-btn:active { transform: scale(0.92); }
+        .ans-btn:active { transform: scale(0.95); }
         
-        .yes { background: var(--success); box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3); }
-        .no { background: var(--danger); box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
-        .maybe { background: var(--warning); box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
-        .win-btn { 
-            grid-column: span 3; background: var(--accent); 
-            margin-top: 10px; font-size: 1.2rem;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
-        }
+        .yes { background: var(--success); }
+        .no { background: var(--danger); }
+        .maybe { background: var(--warning); }
+        .depends { background: var(--info); }
+        
+        .full-width { grid-column: span 2; }
+        .win-btn { background: var(--accent); margin-top: 5px; }
+        .undo-btn { background: transparent; border: 1px solid #334155; color: #64748b; font-size: 0.8rem; padding: 8px; margin-top: 10px; }
 
-        /* Overlay Screens */
+        /* Overlays */
         .overlay { 
             position: fixed; inset: 0; background: var(--bg); 
             z-index: 100; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; text-align: center;
+            justify-content: center; align-items: center;
         }
         
         input { 
             background: var(--card); border: 2px solid #334155;
-            color: white; padding: 18px; width: 280px; 
-            border-radius: 16px; font-size: 1.2rem; margin: 20px;
-            outline: none; transition: border-color 0.3s;
+            color: white; padding: 18px; width: 260px; 
+            border-radius: 16px; font-size: 1.2rem; margin: 20px; text-align: center;
         }
-        input:focus { border-color: var(--accent); }
         
-        .primary-btn { 
-            background: var(--accent); color: white; padding: 16px 48px; 
-            border: none; border-radius: 14px; font-size: 1.2rem; 
-            font-weight: bold; cursor: pointer;
-        }
+        .primary-btn { background: var(--accent); color: white; padding: 16px 40px; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; }
 
         .hidden { display: none !important; }
-        .victory-title { color: var(--success); font-weight: 800; letter-spacing: 2px; }
-        .word-reveal { font-size: 5rem; font-weight: 900; color: var(--text); margin: 20px 0; text-transform: uppercase; }
+        .word-reveal { font-size: 4.5rem; font-weight: 900; color: var(--text); margin: 15px 0; text-transform: uppercase; color: var(--warning); }
     </style>
 </head>
 <body>
 
 <div id="setup" class="overlay">
-    <h1 style="font-size: 3.5rem; margin: 0; background: linear-gradient(to right, #8b5cf6, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">20?</h1>
-    <p style="opacity: 0.6; font-weight: 500;">HOST: ENTER SECRET WORD</p>
-    <input type="password" id="wordInput" placeholder="••••••••" autocomplete="off">
-    <button class="primary-btn" onclick="startGame()">START SESSION</button>
+    <h1 style="color: var(--accent); font-size: 3rem;">20?</h1>
+    <input type="password" id="wordInput" placeholder="Enter Secret Word" autocomplete="off">
+    <button class="primary-btn" onclick="startGame()">START GAME</button>
 </div>
 
 <div id="victory" class="overlay hidden">
-    <p class="victory-title">MISSION ACCOMPLISHED</p>
-    <p style="opacity:0.5;">THE WORD WAS</p>
+    <p style="color: var(--success); font-weight: bold; letter-spacing: 2px;">GUESS COMPLETED</p>
     <div id="finalWordDisplay" class="word-reveal">---</div>
-    <button class="primary-btn" onclick="location.reload()">NEW GAME</button>
+    <button class="primary-btn" onclick="location.reload()">NEW ROUND</button>
 </div>
 
 <div class="game-container">
     <div id="guesser-side" class="side">
         <div class="counter-badge">CHANCES: <span class="q-val">20</span></div>
-        <div id="last-answer" style="color: rgba(255,255,255,0.2);">?</div>
+        <div id="last-answer" style="color: #334155;">READY</div>
     </div>
 
     <div id="host-side" class="side">
         <div id="peek-area">
-            <span style="opacity:0.6; font-size: 0.8rem;">HOLD TO REVEAL</span>
+            <span style="opacity:0.5; font-size: 0.8rem;">HOLD TO PEEK:</span>
             <span id="secret-word-display">NONE</span>
         </div>
         
         <div class="controls">
-            <button class="ans-btn yes" onclick="handleResponse('YES')">YES</button>
-            <button class="ans-btn no" onclick="handleResponse('NO')">NO</button>
-            <button class="ans-btn maybe" onclick="handleResponse('MAYBE')">MAYBE</button>
-            <button class="ans-btn win-btn" onclick="winGame()">TARGET IDENTIFIED 🏆</button>
+            <button class="ans-btn yes" onclick="handleResponse('YES', '#22c55e')">YES</button>
+            <button class="ans-btn no" onclick="handleResponse('NO', '#ef4444')">NO</button>
+            <button class="ans-btn maybe" onclick="handleResponse('MAYBE', '#f59e0b')">MAYBE</button>
+            <button class="ans-btn depends" onclick="handleResponse('DEPENDS', '#3b82f6')">DEPENDS</button>
+            <button class="ans-btn win-btn full-width" onclick="winGame()">🏆 YOU GOT IT!</button>
         </div>
         
-        <div class="counter-badge" style="margin-top: 30px;">TRIES LEFT: <span class="q-val">20</span></div>
+        <button class="ans-btn undo-btn full-width" onclick="undoLast()">Undo Last Answer</button>
+        <div class="counter-badge" style="margin-top: 15px;">TRIES LEFT: <span class="q-val">20</span></div>
     </div>
 </div>
 
 <script>
     let count = 20;
     let secret = "";
+    let history = [];
 
     function startGame() {
         const input = document.getElementById('wordInput');
@@ -169,19 +157,28 @@
         document.getElementById('setup').classList.add('hidden');
     }
 
-    function handleResponse(ans) {
+    function handleResponse(ans, color) {
         if(count <= 0) return;
-        count--;
-        document.querySelectorAll('.q-val').forEach(el => el.innerText = count);
         
+        // Save state for undo
+        history.push({ans: document.getElementById('last-answer').innerText, color: document.getElementById('last-answer').style.color});
+        
+        count--;
+        updateDisplays(ans, color);
+    }
+
+    function undoLast() {
+        if(count >= 20) return;
+        count++;
+        const prev = history.pop() || {ans: "READY", color: "#334155"};
+        updateDisplays(prev.ans, prev.color);
+    }
+
+    function updateDisplays(ans, color) {
+        document.querySelectorAll('.q-val').forEach(el => el.innerText = count);
         const display = document.getElementById('last-answer');
         display.innerText = ans;
-        
-        if(ans === 'YES') display.style.color = '#22c55e';
-        else if(ans === 'NO') display.style.color = '#ef4444';
-        else display.style.color = '#f59e0b';
-
-        if(count === 0) display.innerText = "OVER";
+        display.style.color = color;
     }
 
     function winGame() {
