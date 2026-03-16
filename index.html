@@ -3,37 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20 Questions: Pro Edition</title>
+    <title>20 Questions: Supreme</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #8b5cf6;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6; /* Color for Depends */
-            --text: #f8fafc;
+            --bg: #0f172a; --card: #1e293b; --accent: #8b5cf6;
+            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
+            --info: #3b82f6; --text: #f8fafc;
         }
 
+        /* THEMES */
+        body.theme-neon { --bg: #000; --accent: #0ff; --card: #111; --text: #fff; }
+        body.theme-paper { --bg: #f4f1ea; --accent: #795548; --card: #fff; --text: #2d2d2d; }
+
         body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; 
             overflow: hidden; background: var(--bg); color: var(--text);
-            user-select: none; -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none; transition: 0.3s;
         }
 
         .game-container { display: flex; flex-direction: column; height: 100vh; }
+        .side { flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
 
-        .side { 
-            flex: 1; padding: 20px; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; position: relative;
+        /* GUESSER SIDE (Top) */
+        #guesser-side { 
+            background: linear-gradient(to bottom, rgba(30,27,75,0.5), transparent);
+            transform: rotate(180deg); border-bottom: 2px solid rgba(255,255,255,0.05);
+        }
+        
+        /* HOST SIDE (Bottom) */
+        #host-side { background: linear-gradient(to top, rgba(15,23,42,0.8), transparent); }
+
+        /* DASHBOARD ELEMENTS */
+        .stats-row { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.8rem; font-weight: bold; }
+        .badge { background: var(--card); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        #history-log { 
+            font-size: 0.7rem; max-height: 60px; overflow-y: auto; 
+            width: 80%; opacity: 0.6; text-align: center; margin-top: 10px;
         }
 
-        #guesser-side { 
-            background: linear-gradient(to bottom, #1e1b4b, #0f172a);
-            transform: rotate(180deg);
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+        /* PEEK AREA */
+        #peek-area { 
+            background: var(--card); padding: 10px 20px; border-radius: 50px;
+            margin-bottom: 15px; border: 1px solid var(--accent); cursor: pointer;
+        }
+        #secret-word-display { display: none; color: var(--warning); font-weight: 800; margin-left: 10px; pointer-events: none; }
+        #peek-area:active #secret-word-display { display: inline; }
+
+        #last-answer { font-size: 4rem; font-weight: 900; margin: 5px; transition: 0.2s; }
+
+        /* BUTTONS */
+        .controls { width: 95%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .ans-btn { padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.1s; }
+        .ans-btn:active { transform: scale(0.95); }
+        .yes { background: var(--success); }
+        .no { background: var(--danger); }
+        .maybe { background: var(--warning); }
+        .depends { background: var(--info); }
+        .win-btn { grid-column: span 2; background: var(--accent); }
+        .small-btn { grid-column: span 1; background: #334155; font-size: 0.7rem; }
+
+        /* OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        input, select { background: var(--card); border: 2px solid #334155; color: white; padding: 15px; border-radius: 12px; margin: 5px; width: 250px; text-align: center; }
+        .primary-btn { background: var(--accent); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        
+        .hidden { display: none !important; }
+        .victory-reveal { font-size: 4rem; color: var(--warning); font-weight: 900; margin: 20px 0; }
+
+        /* CONFETTI ANIMATION */
+        @keyframes confetti { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        .confetti { position: absolute; width: 10px; height: 10px; background: var(--accent); animation: confetti 2s linear forwards; }
+    </style>
+</head>
+<body id="body">
+
+<div id="setup" class="overlay">
+    <h1 style="color:var(--accent)">SUPREME 20?</h1>
+    <input type="password" id="wordInput" placeholder="Secret Word">
+    <select id="categoryInput">
+        <option value="Object">Category: Object</option>
+        <option value="Person">Category: Person</option>
+        <option value="Place">Category: Place</option>
+        <option value="Food">Category: Food</option>
+    </select>
+    <select id="themeSelect" onchange="changeTheme(this.value)">
+        <option value="">Default Theme</option>
+        <option value="theme-neon">Neon Mode</option>
+        <option value="theme-paper">Classic Paper</option>
+    </select>
+    <button class="primary-btn" onclick="startGame()">START BATTLE</button>
+</div>
+
+<div id="victory" class="overlay hidden">
+    <h2 id="winStatus">WINNER!</h2>
+    <div id="finalWordDisplay" class="victory-reveal">---</div>
+    <button class="primary-btn" onclick="location.reload()">PLAY AGAIN</button>
+</div>
+
+<div class="game-container">
+    <div id="guesser-side" class="side">
+        <div class="stats-row">
+            <div class="badge">TIME: <span id="g-timer">30</span>s</div>
+            <div class="badge">SCORE: <span class="score-val">1000</span></div>
+        </div>
+        <div id="last-answer">READY</div>
+        <div id="history-log">History: Waiting for questions...</div>
+    </div>
+
+    <div id="host-side" class="side">
+        <div class="stats-row">
+            <div class="badge">CATEGORY: <span id="cat-val">?</span></div>
+            <div class="badge">TRIES: <span class="q-val">20</span></div>
+        </div>
+        
+        <div id="peek-area">HOLD TO PEEK <span id="secret-word-display">NONE</span></div>
+        
+        <div class="controls">
+            <button class="ans-btn yes" onclick="handleAns('YES', '#22c55e')">YES</button>
+            <button class="ans-btn no" onclick="handleAns('NO', '#ef4444')">NO</button>
+            <button class="ans-btn maybe" onclick="handleAns('MAYBE', '#f59e0b')">MAYBE</button>
+            <button class="ans-btn depends" onclick="handleAns('DEPENDS', '#3b82f6')">DEPENDS</button>
+            <button class="ans-btn win-btn" onclick="endGame(true)">🏆 THEY GOT IT!</button>
+            <button class="ans-btn small-btn" onclick="undo()">UNDO</button>
+        </div>
+        
+        <div class="stats-row" style="margin-top:15px">
+            <div class="badge">SCORE: <span class="score-val">1000</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let count = 20, score = 1000, timerVal = 30, history = [], timerInt, secretWord = "";
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function beep(freq, type = 'sine') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function changeTheme(theme) { document.getElementById('body').className = theme; }
+
+    function startGame() {
+        secretWord = document.getElementById('wordInput').value.toUpperCase();
+        if(!secretWord) return alert("Enter a word!");
+        document.getElementById('cat-val').innerText = document.getElementById('categoryInput').value;
+        document.getElementById('secret-word-display').innerText = secretWord;
+        document.getElementById('finalWordDisplay').innerText = secretWord;
+        document.getElementById('setup').classList.add('hidden');
+        resetTimer();
+    }
+
+    function resetTimer() {
+        clearInterval(timerInt);
+        timerVal = 30;
+        timerInt = setInterval(() => {
+            timerVal--;
+            document.getElementById('g-timer').innerText = timerVal;
+            if(timerVal === 0) { beep(100, 'square'); handleAns('TIME UP!', '#94a3b8'); }
+        }, 1000);
+    }
+
+    function handleAns(ans, color) {
+        if(count <= 0) return;
+        beep(ans === 'YES' ? 600 : 300);
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
+
+        history.push({ans: document.getElementById('last-answer').innerText, color: document.getElementById('last-answer').style.color, score: score});
+        
+        count--;
+        score -= 50;
+        updateUI(ans, color);
+        
+        let historyText = JSON.parse(JSON.stringify(history)).map(h => h.ans).join(" • ");
+        document.getElementById('history-log').innerText = "History: " + historyText;
+        
+        resetTimer();
+        if(count === 0) endGame(false);
+    }
+
+    function undo() {
+        if(history.length === 0) return;
+        count++; score += 50;
+        let last = history.pop();
+        updateUI(last.ans, last.color);
+        resetTimer();
+    }
+
+    function updateUI(ans, color) {
+        document.querySelectorAll('.q-val').forEach(e => e.innerText = count);
+        document.querySelectorAll('.score-val').forEach(e => e.innerText = score);
+        const disp = document.getElementById('last-answer');
+        disp.innerText = ans; disp.style.color = color;
+    }
+
+    function endGame(won) {
+        clearInterval(timerInt);
+        if(won) {
+            document.getElementById('winStatus').innerText = "🏆 TARGET ACQUIRED!";
+            for(let i=0; i<30; i++) spawnConfetti();
+            beep(800); setTimeout(() => beep(1000), 200);
+        } else {
+            document.getElementById('winStatus').innerText = "💀 OUT OF TRIES";
+            beep(150, 'sawtooth');
+        }
+        document.getElementById('victory').classList.remove('hidden');
+    }
+
+    function spawnConfetti() {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.backgroundColor = ['#8b5cf6','#22c55e','#ef4444','#f59e0b'][Math.floor(Math.random()*4)];
+        c.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+    }
+</script>
+</body>
+</html>
         }
 
         #host-side { background: linear-gradient(to top, #111827, #0f172a); }
