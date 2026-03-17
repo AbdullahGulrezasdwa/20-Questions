@@ -3,111 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20? SUPREME CAREER</title>
+    <title>20? BOUTIQUE EDITION</title>
     <style>
         :root {
-            --bg: #020617; --card: rgba(30, 41, 59, 0.7);
-            --accent: #c084fc; --success: #4ade80; --danger: #f87171;
-            --text: #f8fafc; --grad: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
+            --bg: #020617; --card: rgba(15, 23, 42, 0.9);
+            --accent: #c084fc; --success: #22c55e; --danger: #ef4444;
+            --warning: #f59e0b; --info: #3b82f6; --text: #f8fafc;
+            --grad: linear-gradient(135deg, #0f172a 0%, #020617 100%);
         }
-        .theme-sunset { --bg: #450a0a; --card: rgba(127, 29, 29, 0.7); --accent: #fbbf24; --success: #f472b6; --danger: #ef4444; --grad: linear-gradient(135deg, #7c2d12 0%, #450a0a 100%); }
-        .theme-ocean { --bg: #083344; --card: rgba(21, 94, 117, 0.7); --accent: #22d3ee; --success: #34d399; --danger: #fb7185; --grad: linear-gradient(135deg, #164e63 0%, #083344 100%); }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; overflow: hidden; }
+        /* THEMES */
+        .theme-sunset { --bg: #450a0a; --accent: #fbbf24; --grad: linear-gradient(135deg, #7c2d12 0%, #450a0a 100%); }
+        .theme-ocean { --bg: #083344; --accent: #22d3ee; --grad: linear-gradient(135deg, #164e63 0%, #083344 100%); }
+        .theme-void { --bg: #000000; --accent: #ffffff; --grad: linear-gradient(180deg, #111 0%, #000 100%); }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; overflow: hidden; }
 
         .game-container { display: flex; flex-direction: column; height: 100dvh; background: var(--grad); transition: 0.5s; }
-        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        #guesser-side { transform: rotate(180deg); border-bottom: 2px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 20px; }
+        #guesser-side { transform: rotate(180deg); border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
 
-        /* RING VIZ */
-        .ring-svg { width: 100px; height: 100px; transform: rotate(-90deg); filter: drop-shadow(0 0 10px var(--accent)); }
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 10; }
-        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 10; stroke-dasharray: 314; stroke-dashoffset: 0; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
+        /* THE "THIN" ORIGINAL FONT STYLE */
+        #last-ans { 
+            font-size: 4.2rem; 
+            font-weight: 300; /* Thin weight */
+            letter-spacing: 2px; 
+            text-transform: uppercase;
+            transition: 0.3s ease;
+        }
 
-        /* UI ELEMENTS */
-        .btn { border: none; border-radius: 18px; font-weight: 800; color: white; cursor: pointer; transition: 0.2s; touch-action: manipulation; }
-        .btn:active { transform: scale(0.92); filter: brightness(1.2); }
-        .yes { background: var(--success); } .no { background: var(--danger); } .util { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); }
-        .host-btn { background: var(--accent); font-size: 1.2rem; padding: 18px 45px; border-radius: 50px; color: #000; box-shadow: 0 10px 25px rgba(192, 132, 252, 0.4); }
+        /* BUTTONS */
+        .btn { border: none; border-radius: 18px; font-weight: 700; color: white; cursor: pointer; transition: 0.2s; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
+        .btn:active { transform: scale(0.94); filter: brightness(1.2); }
+        .yes { background: var(--success); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
+        .no { background: var(--danger); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
+        .util { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); }
+        .host-prime { background: var(--accent); color: #000; font-size: 1.2rem; padding: 20px 45px; border-radius: 50px; font-weight: 900; }
 
-        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; transition: 0.4s ease; }
-        .hidden { opacity: 0; pointer-events: none; transform: translateY(30px); }
-        .card { background: var(--card); width: 100%; max-width: 380px; padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 12px; }
+        /* OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; transition: 0.4s; }
+        .hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
+        .card { background: var(--card); width: 100%; max-width: 400px; padding: 25px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 15px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
 
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-        .stat-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 15px; text-align: center; }
-        .stat-val { display: block; font-size: 1.2rem; font-weight: 900; color: var(--accent); }
-        .stat-lab { font-size: 0.6rem; opacity: 0.6; text-transform: uppercase; }
+        /* SHOP GRID */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px; }
+        .shop-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .shop-item span { display: block; font-size: 0.7rem; opacity: 0.6; margin-top: 4px; }
 
-        #last-ans { font-size: 4.5rem; font-weight: 900; }
-        .blanks { letter-spacing: 5px; font-weight: bold; font-size: 1.3rem; color: var(--accent); }
-        input, select { background: rgba(0,0,0,0.3); border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 12px; font-size: 16px; text-align: center; }
-        .confetti { position: absolute; width: 8px; height: 8px; z-index: 2000; pointer-events: none; border-radius: 50%; }
+        /* RING */
+        .ring-svg { width: 90px; height: 90px; transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 6; }
+        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 6; stroke-dasharray: 251; stroke-dashoffset: 0; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
+
+        input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 15px; font-size: 16px; text-align: center; }
+        input:focus { border-color: var(--accent); }
     </style>
 </head>
 <body id="b">
 
 <div id="m-menu" class="overlay">
-    <h1 style="font-size: 4.5rem; margin: 0; letter-spacing: -5px; color: var(--accent);">20?</h1>
-    <div style="margin: 10px 0; background: var(--card); padding: 8px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);">
-        <span id="p-av">👤</span> <span id="p-rnk" style="font-weight: 900; color: var(--accent);">NOVICE</span> 
-        <span style="opacity:0.5; margin: 0 5px;">|</span> LVL <span id="lv">1</span>
+    <div style="font-size: 0.8rem; color: var(--accent); font-weight: 900; letter-spacing: 3px;" id="p-title">THE NOVICE</div>
+    <h1 style="font-size: 5.5rem; margin: 0; letter-spacing: -7px; color: var(--text);">20?</h1>
+    <div style="margin: 20px 0; display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 50px;">
+        <span id="p-av" style="font-size: 1.5rem;">👤</span>
+        <span style="font-weight: 800; opacity: 0.8;">💰 <span id="p-co">0</span> | LVL <span id="p-lv">1</span></span>
     </div>
-    <button class="btn host-btn" onclick="view('d-dash')">HOST GAME</button>
-    <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-        <button class="btn util" style="padding:12px" onclick="view('s-stats')">📊</button>
-        <button class="btn util" style="padding:12px" onclick="view('sh-shop')">🛒</button>
-        <button class="btn util" style="padding:12px" onclick="cycleTheme()">🎨</button>
-    </div>
-</div>
-
-<div id="s-stats" class="overlay hidden">
-    <div class="card">
-        <h2 style="margin:0; text-align:center;">CAREER STATS</h2>
-        <div class="stat-grid">
-            <div class="stat-box"><span class="stat-val" id="st-w">0</span><span class="stat-lab">Wins</span></div>
-            <div class="stat-box"><span class="stat-val" id="st-l">0</span><span class="stat-lab">Losses</span></div>
-            <div class="stat-box"><span class="stat-val" id="st-rate">0%</span><span class="stat-lab">Win Rate</span></div>
-            <div class="stat-box"><span class="stat-val" id="st-qs">0</span><span class="stat-lab">Total Qs</span></div>
-            <div class="stat-box"><span class="stat-val" id="st-coins">0</span><span class="stat-lab">Earned</span></div>
-            <div class="stat-box"><span class="stat-val" id="st-xp">0</span><span class="stat-lab">Total XP</span></div>
-        </div>
-        <button class="btn no" style="padding:12px" onclick="view('m-menu')">CLOSE</button>
-    </div>
-</div>
-
-<div id="d-dash" class="overlay hidden">
-    <div class="card">
-        <h2 style="margin:0; text-align:center;">HOST SETUP</h2>
-        <input type="password" id="wIn" placeholder="SECRET WORD">
-        <select id="qIn">
-            <option value="20">NORMAL (20 Qs)</option>
-            <option value="10">HARD (10 Qs)</option>
-            <option value="5">INSANE (5 Qs)</option>
-        </select>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.8rem;">
-            <span>DOUBLE PENALTY</span>
-            <input type="checkbox" id="penT" style="width:20px; height:20px">
-        </div>
-        <button class="btn yes" style="padding:18px; font-size:1.1rem;" onclick="launch()">LAUNCH GAME</button>
-        <button class="btn util" onclick="view('m-menu')">BACK</button>
+    <button class="btn host-prime" onclick="view('d-dash')">HOST SESSION</button>
+    <div style="margin-top: 15px; display: flex; gap: 10px;">
+        <button class="btn util" style="padding: 15px 30px" onclick="view('sh-shop')">🛒 SHOP</button>
+        <button class="btn util" style="padding: 15px" onclick="cycleTheme()">🎨</button>
     </div>
 </div>
 
 <div id="sh-shop" class="overlay hidden">
     <div class="card">
-        <h2>SHOP (Coins: <span id="sh-co">0</span>)</h2>
-        <button class="btn util" style="padding:12px" onclick="buy('🥷', 50)">NINJA (50)</button>
-        <button class="btn util" style="padding:12px" onclick="buy('👽', 100)">ALIEN (100)</button>
-        <button class="btn util" style="padding:12px" onclick="buy('👑', 200)">KING (200)</button>
-        <button class="btn no" onclick="view('m-menu')">EXIT</button>
+        <h2 style="margin:0;">BOUTIQUE</h2>
+        <p style="margin:0; font-size: 0.9rem; opacity: 0.7;">Wallet: 💰 <span id="sh-co">0</span></p>
+        <div class="shop-grid">
+            <div class="shop-item" onclick="buy('av', '🥷', 50)">🥷 <span>NINJA (50)</span></div>
+            <div class="shop-item" onclick="buy('av', '👾', 50)">👾 <span>INVADER (50)</span></div>
+            <div class="shop-item" onclick="buy('av', '👑', 200)">👑 <span>ROYAL (200)</span></div>
+            <div class="shop-item" onclick="buy('av', '💎', 500)">💎 <span>LEGEND (500)</span></div>
+            <div class="shop-item" onclick="buy('th', 'sunset', 100)">🌅 <span>SUNSET (100)</span></div>
+            <div class="shop-item" onclick="buy('th', 'ocean', 100)">🌊 <span>OCEAN (100)</span></div>
+            <div class="shop-item" onclick="buy('th', 'void', 300)">🌑 <span>VOID (300)</span></div>
+            <div class="shop-item" onclick="buy('ti', 'THE ORACLE', 150)">📜 <span>ORACLE (150)</span></div>
+            <div class="shop-item" onclick="buy('ti', 'MIND READER', 250)">🧠 <span>READER (250)</span></div>
+            <div class="shop-item" onclick="buy('ti', 'GRANDMASTER', 1000)">🏆 <span>GM (1000)</span></div>
+        </div>
+        <button class="btn no" style="padding:15px;" onclick="view('m-menu')">CLOSE</button>
+    </div>
+</div>
+
+<div id="d-dash" class="overlay hidden">
+    <div class="card">
+        <h2 style="margin:0; text-align:center; letter-spacing: 2px;">HOST SETUP</h2>
+        <input type="password" id="wIn" placeholder="SECRET WORD" oninput="document.getElementById('wLen').innerText = this.value.length">
+        <div style="text-align:center; font-size: 0.7rem; opacity: 0.5;">LENGTH: <span id="wLen">0</span> CHARS</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+            <span style="font-size:0.7rem; opacity:0.7">TURNS:</span>
+            <input type="number" id="qIn" value="20" min="1" max="99">
+        </div>
+        <button class="btn yes" style="padding:20px; font-size:1.1rem;" onclick="launch()">START SESSION</button>
+        <button class="btn util" onclick="view('m-menu')">BACK</button>
     </div>
 </div>
 
 <div id="v-win" class="overlay hidden">
     <h1 id="win-t" style="font-size: 3rem; margin:0;">-</h1>
-    <h2 id="win-w" style="font-size: 4rem; color: var(--accent); margin: 10px 0;">-</h2>
+    <h2 id="win-w" style="font-size: 4rem; color: var(--accent); margin: 10px 0; font-weight: 300;">-</h2>
     <p id="win-r" style="font-weight:bold; opacity:0.6;"></p>
     <button class="btn yes" style="padding: 20px 60px;" onclick="location.reload()">PLAY AGAIN</button>
 </div>
@@ -115,91 +120,87 @@
 <div class="game-container">
     <div id="guesser-side" class="side">
         <div style="position: relative;">
-            <svg class="ring-svg"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle id="r-fill" class="ring-fill" cx="50" cy="50" r="45"/></svg>
-            <div style="position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:1.8rem; font-weight:900;" id="q-val">20</div>
+            <svg class="ring-svg"><circle class="ring-bg" cx="45" cy="45" r="40"/><circle id="r-fill" class="ring-fill" cx="45" cy="45" r="40"/></svg>
+            <div style="position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:1.5rem; font-weight:300;" id="q-val">20</div>
         </div>
-        <div style="margin-top: 15px; text-align: center;">
-            <div id="h-lab" style="font-size: 0.7rem; opacity: 0.8; font-weight: bold; height:15px; color:var(--accent);"></div>
-            <div id="bl" class="blanks"></div>
+        <div style="margin-top: 20px; text-align: center;">
+            <div id="h-lab" style="font-size: 0.7rem; color: var(--accent); font-weight: 900; min-height:1rem; letter-spacing: 1px;"></div>
+            <div id="bl" style="letter-spacing: 5px; font-weight: 900; font-size: 1.4rem; margin-top:5px; opacity:0.8;"></div>
         </div>
         <div id="last-ans">READY</div>
     </div>
 
     <div id="host-side" class="side">
-        <div id="pk" style="background: rgba(255,255,255,0.05); padding: 12px 25px; border-radius: 50px; border: 2px solid var(--accent); margin-bottom: 15px; font-weight: 800;" 
+        <div id="pk-btn" style="padding: 10px 25px; border-radius: 50px; border: 1px solid var(--accent); margin-bottom: 20px; font-size: 0.8rem; font-weight: 900; cursor: pointer; opacity: 0.6;" 
              onmousedown="pk(1)" onmouseup="pk(0)" ontouchstart="pk(1)" ontouchend="pk(0)">
-            PEEK: <span id="pk-w" style="opacity:0;">-</span>
+            HOLD: <span id="pk-w" style="opacity:0; color:var(--warning)">-</span>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 92%; max-width: 400px;">
-            <button class="btn yes" style="height:55px" onclick="hit('YES', 'var(--success)', 800)">YES</button>
-            <button class="btn no" style="height:55px" onclick="hit('NO', 'var(--danger)', 400)">NO</button>
-            <button class="btn util" style="height:55px" onclick="hit('MAYBE', 'var(--accent)', 600)">MAY</button>
-            <button class="btn util" style="height:55px" onclick="hit('DEP.', '#fff', 500)">DEP.</button>
-            <button class="btn yes" style="grid-column: span 3; height: 60px; font-size: 1.2rem;" onclick="finish(1)">🏆 GUESSED!</button>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 92%; max-width: 420px;">
+            <button class="btn yes" style="height:60px" onclick="hit('YES', 'var(--success)')">YES</button>
+            <button class="btn no" style="height:60px" onclick="hit('NO', 'var(--danger)')">NO</button>
+            <button class="btn util" style="height:60px; color:var(--warning)" onclick="hit('MAYBE', 'var(--warning)')">MAY</button>
+            <button class="btn util" style="height:60px; color:var(--info)" onclick="hit('DEP.', 'var(--info)')">DEP.</button>
+            
+            <button class="btn yes" style="grid-column: span 3; height: 70px; font-size: 1.3rem; font-weight: 900;" onclick="finish(1)">🏆 GUESSED!</button>
             <button class="btn util" onclick="addHint()">HINT</button>
-            <button class="btn util" style="grid-column: span 2;" onclick="undo()">UNDO</button>
-            <button class="btn util" style="grid-column: span 2;" onclick="location.reload()">QUIT</button>
+            
+            <button class="btn util" style="grid-column: span 2; height: 50px;" onclick="undo()">UNDO</button>
+            <button class="btn util" style="grid-column: span 2; height: 50px;" onclick="location.reload()">EXIT</button>
         </div>
     </div>
 </div>
 
 <script>
-    const def = { xp: 0, txp: 0, lvl: 1, co: 0, tco: 0, th: 'cyber', av: '👤', w: 0, l: 0, tq: 0 };
-    let st = JSON.parse(localStorage.getItem('20q-supreme')) || def;
+    const def = { xp: 0, lvl: 1, co: 0, th: 'cyber', av: '👤', ti: 'THE NOVICE', inv: ['👤', 'THE NOVICE'] };
+    let st = JSON.parse(localStorage.getItem('20q-boutique')) || def;
     let cur, tot, sec = "", hist = [];
-    const themes = ['cyber', 'sunset', 'ocean'];
-    const actx = new (window.AudioContext || window.webkitAudioContext)();
 
     function save() { 
-        localStorage.setItem('20q-supreme', JSON.stringify(st)); 
-        document.getElementById('lv').innerText = st.lvl;
-        document.getElementById('co').innerText = st.co;
+        localStorage.setItem('20q-boutique', JSON.stringify(st)); 
+        document.getElementById('p-lv').innerText = st.lvl;
+        document.getElementById('p-co').innerText = st.co;
         document.getElementById('sh-co').innerText = st.co;
         document.getElementById('p-av').innerText = st.av;
-        
-        // Stats Calculation
-        document.getElementById('st-w').innerText = st.w;
-        document.getElementById('st-l').innerText = st.l;
-        document.getElementById('st-qs').innerText = st.tq;
-        document.getElementById('st-coins').innerText = st.tco;
-        document.getElementById('st-xp').innerText = st.txp;
-        document.getElementById('st-rate').innerText = st.w + st.l > 0 ? Math.round((st.w / (st.w + st.l)) * 100) + "%" : "0%";
-        
-        const ranks = ["NOVICE", "SEER", "ORACLE", "MENTALIST", "MIND KING"];
-        document.getElementById('p-rnk').innerText = ranks[Math.min(st.lvl-1, 4)];
+        document.getElementById('p-title').innerText = st.ti;
     }
 
-    function view(id) { document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden')); if(id !== 'none') document.getElementById(id).classList.remove('hidden'); }
-    function cycleTheme() { st.th = themes[(themes.indexOf(st.th) + 1) % themes.length]; applyTheme(); save(); }
+    function view(id) { 
+        document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden')); 
+        if(id !== 'none') document.getElementById(id).classList.remove('hidden'); 
+    }
+
+    function cycleTheme() {
+        const ths = ['cyber', 'sunset', 'ocean', 'void'];
+        st.th = ths[(ths.indexOf(st.th) + 1) % ths.length];
+        applyTheme(); save();
+    }
+
     function applyTheme() { document.body.className = st.th === 'cyber' ? '' : 'theme-' + st.th; }
-    function buy(av, p) { if(st.co >= p) { st.co -= p; st.av = av; save(); alert("Avatar Set!"); } else alert("No coins!"); }
-    function pk(v) { document.getElementById('pk-w').style.opacity = v ? 1 : 0; }
+
+    function buy(type, val, price) {
+        if(st.inv.includes(val)) { st[type] = val; save(); applyTheme(); return; }
+        if(st.co >= price) {
+            st.co -= price; st.inv.push(val); st[type] = val;
+            save(); applyTheme(); alert("Unlocked!");
+        } else alert("Need more coins!");
+    }
 
     function launch() {
         sec = document.getElementById('wIn').value.trim().toUpperCase();
-        if(!sec) return;
-        tot = parseInt(document.getElementById('qIn').value);
+        if(!sec) return alert("Word needed!");
+        tot = parseInt(document.getElementById('qIn').value) || 20;
         cur = tot;
         document.getElementById('pk-w').innerText = sec;
         document.getElementById('win-w').innerText = sec;
         document.getElementById('bl').innerText = sec.replace(/[A-Z]/g, "_ ");
-        view('none');
-        upd();
+        view('none'); upd();
     }
 
-    function hit(a, c, f) {
+    function hit(a, c) {
         if(cur <= 0) return;
-        const o = actx.createOscillator(), g = actx.createGain();
-        o.frequency.value = f; g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.3);
-        o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.3);
-        
         hist.push({a: document.getElementById('last-ans').innerText, c: document.getElementById('last-ans').style.color, cur, h: document.getElementById('h-lab').innerText});
-        
-        let cost = (document.getElementById('penT').checked && (a==='MAYBE' || a==='DEP.')) ? 2 : 1;
-        cur = Math.max(0, cur - cost);
-        st.tq++;
-        
-        if(cur <= 12) document.getElementById('h-lab').innerText = "CLUE: STARTS WITH " + sec[0];
+        cur--;
+        if(cur <= 8) document.getElementById('h-lab').innerText = "CLUE: STARTS WITH " + sec[0];
         upd(a, c);
         if(cur === 0 && a !== 'YES') finish(0);
     }
@@ -208,41 +209,33 @@
         document.getElementById('q-val').innerText = cur;
         const l = document.getElementById('last-ans');
         l.innerText = a; l.style.color = c;
-        document.getElementById('r-fill').style.strokeDashoffset = 314 - (314 * (cur / tot));
+        document.getElementById('r-fill').style.strokeDashoffset = 251 - (251 * (cur / tot));
     }
 
     function undo() {
         if(!hist.length) return;
         const p = hist.pop();
-        cur = p.cur; st.tq--;
+        cur = p.cur;
         document.getElementById('h-lab').innerText = p.h;
         upd(p.a, p.c);
     }
 
     function addHint() {
-        if(cur < 5) return alert("Costs 5 Qs!");
+        if(cur < 5) return alert("Costs 5!");
         let h = prompt("Hint:");
         if(h) { cur -= 5; document.getElementById('h-lab').innerText = "HINT: " + h.toUpperCase(); upd("HINT", "var(--accent)"); }
     }
 
+    function pk(v) { document.getElementById('pk-w').style.opacity = v ? 1 : 0; }
+
     function finish(w) {
         const t = document.getElementById('win-t');
         if(w) {
-            t.innerText = "VICTORY!"; t.style.color = "var(--success)";
-            document.getElementById('win-r').innerText = "+25 Coins | +40 XP";
-            st.w++; st.co += 25; st.tco += 25; st.xp += 40; st.txp += 40;
-            if(st.xp >= st.lvl*100) { st.lvl++; st.xp=0; }
-            for(let i=0; i<50; i++) {
-                const c = document.createElement('div'); c.className = 'confetti';
-                c.style.left = Math.random()*100+'vw'; c.style.top = '-10px';
-                c.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 50%)`;
-                document.body.appendChild(c);
-                c.animate([{transform:'translateY(0)'},{transform:`translateY(100vh) rotate(${Math.random()*360}deg)`}], 2000+Math.random()*2000).onfinish = () => c.remove();
-            }
+            t.innerText = "VICTORY"; t.style.color = "var(--success)";
+            st.co += 30; st.xp += 50; if(st.xp >= st.lvl*100) { st.lvl++; st.xp=0; }
+            document.getElementById('win-r').innerText = "+30 COINS | +50 XP";
         } else {
             t.innerText = "DEFEAT"; t.style.color = "var(--danger)";
-            document.getElementById('win-r').innerText = "Better luck next time!";
-            st.l++;
         }
         save(); view('v-win');
     }
