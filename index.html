@@ -3,328 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20? SUPREME ENGINE v2.1</title>
+    <title>20? SUPREME ENGINE v3.1</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg: #020617; 
-            --glass: rgba(255, 255, 255, 0.05);
-            --accent: #8b5cf6; 
-            --success: #22c55e; 
-            --danger: #ef4444;
-            --warning: #f59e0b; /* FIX: Added missing warning color */
-            --text: #f8fafc; 
-            --font: 'Inter', system-ui, sans-serif;
+            --bg: #020617; --glass: rgba(255, 255, 255, 0.03);
+            --accent: #8b5cf6; --success: #22c55e; --danger: #ef4444;
+            --warning: #f59e0b; --text: #f8fafc; --gold: #fbbf24;
         }
 
         body, html { 
-            margin: 0; padding: 0; height: 100%; height: 100dvh; 
-            font-family: var(--font);
-            background: var(--bg); color: var(--text); 
-            overflow: hidden;
+            margin: 0; padding: 0; height: 100dvh; font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text); overflow: hidden;
             user-select: none; -webkit-user-select: none;
         }
 
+        /* Animated Nebula Background */
+        .nebula {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 20% 30%, #1e1b4b 0%, #020617 100%);
+        }
+        .nebula::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.2; animation: drift 60s linear infinite;
+        }
+        @keyframes drift { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
+
+        /* Component Styling */
         .game-container { display: flex; flex-direction: column; height: 100dvh; }
-        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transition: 0.5s ease; }
         
         #guesser-side { 
-            background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
-            transform: rotate(180deg); 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px);
+            transform: rotate(180deg); border-bottom: 2px solid var(--accent);
         }
 
         .dashboard {
-            background: #0f172a; width: 85%; max-width: 380px; padding: 25px;
-            border-radius: 24px; border: 1px solid var(--accent);
-            display: flex; flex-direction: column; gap: 12px;
-            max-height: 80vh; overflow-y: auto;
+            background: rgba(15, 23, 42, 0.95); width: 85%; max-width: 400px; padding: 30px;
+            border-radius: 32px; border: 2px solid var(--accent);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+            display: flex; flex-direction: column; gap: 15px;
         }
-        
-        .ring-container { position: relative; width: 85px; height: 85px; }
-        .ring-container svg { transform: rotate(-90deg); width: 85px; height: 85px; }
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 7; }
+
+        .ring-container { position: relative; width: 110px; height: 110px; }
+        .ring-container svg { transform: rotate(-90deg); width: 110px; height: 110px; }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 10; }
         .ring-bar { 
-            fill: none; stroke: var(--accent); stroke-width: 7; 
-            stroke-dasharray: 245; stroke-dashoffset: 0; 
-            transition: 0.4s ease-out; stroke-linecap: round; 
+            fill: none; stroke: var(--accent); stroke-width: 10; 
+            stroke-dasharray: 314; stroke-dashoffset: 0; 
+            transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); stroke-linecap: round; 
         }
 
         .btn { 
-            padding: 12px; border: none; border-radius: 12px; 
-            font-weight: bold; color: white; cursor: pointer; 
-            touch-action: manipulation; font-family: inherit; 
-            transition: transform 0.1s, opacity 0.1s;
+            padding: 16px; border: none; border-radius: 18px; font-weight: 800; 
+            color: white; cursor: pointer; touch-action: manipulation;
+            transition: all 0.2s; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.8rem;
         }
-        .btn:active { transform: scale(0.95); opacity: 0.8; }
-        .yes { background: var(--success); } 
-        .no { background: var(--danger); } 
-        .util { background: #334155; }
-        .host-btn { background: var(--accent); font-size: 1.2rem; padding: 18px 40px; border-radius: 50px; }
+        .btn:active { transform: scale(0.92); filter: brightness(1.3); }
+        .yes { background: var(--success); box-shadow: 0 5px 0 #15803d; }
+        .no { background: var(--danger); box-shadow: 0 5px 0 #991b1b; }
+        .util { background: #334155; box-shadow: 0 5px 0 #1e293b; }
+        .gold-btn { background: var(--gold); color: #000; box-shadow: 0 5px 0 #b45309; }
 
-        .overlay { 
-            position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); 
-            z-index: 1000; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 20px; 
-        }
+        .overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.97); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .hidden { display: none !important; }
         
-        /* FIX: Ensure font-size is 16px to prevent iOS auto-zoom */
-        input, select { 
-            background: var(--glass); border: 1px solid var(--accent); 
-            color: white; padding: 12px; border-radius: 8px; 
-            width: 100%; font-size: 16px; box-sizing: border-box;
-        }
+        input, select { background: var(--glass); border: 2px solid var(--accent); color: white; padding: 18px; border-radius: 14px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box; }
         
-        #last-answer { font-size: 4rem; font-weight: 900; margin: 5px 0; }
-        #clue-box { height: 3rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .hint-text { font-size: 0.8rem; color: var(--accent); font-weight: bold; }
-        .reveal-text { font-size: 1.1rem; color: var(--text); letter-spacing: 2px; }
-
-        @keyframes shake { 
-            0%, 100% { transform: rotate(180deg) translateX(0); } 
-            20% { transform: rotate(180deg) translateX(-6px); } 
-            80% { transform: rotate(180deg) translateX(6px); } 
-        }
-        .shake-anim { animation: shake 0.25s ease-in-out; }
+        #last-answer { font-family: 'Orbitron'; font-size: 4.5rem; font-weight: 900; margin: 10px 0; letter-spacing: -2px; }
+        
+        .badge-row { display: flex; gap: 8px; margin-bottom: 25px; }
+        .badge { background: var(--glass); padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); }
+        
+        @keyframes shake { 0%, 100% { transform: rotate(180deg) translate(0); } 20% { transform: rotate(180deg) translate(-12px); } 80% { transform: rotate(180deg) translate(12px); } }
+        .shake { animation: shake 0.2s ease-in-out 2; }
     </style>
 </head>
 <body>
 
+<div class="nebula"></div>
+
 <div id="main-menu" class="overlay">
-    <h1 style="color:var(--accent); font-size: 4rem; margin: 0; letter-spacing: -4px;">20?</h1>
-    <div style="margin: 15px 0; background: var(--glass); padding: 8px 16px; border-radius: 50px; font-size: 0.85rem;">
-        <span id="menu-avatar">👤</span> LVL <span id="menu-lvl">1</span> | 💰 <span id="menu-coins">0</span>
+    <h1 style="font-family: 'Orbitron'; font-size: 5rem; margin: 0; color: var(--accent); letter-spacing: -5px;">20<span style="color:white">?</span></h1>
+    <div class="badge-row">
+        <div class="badge"><span id="m-avatar">👤</span></div>
+        <div class="badge">LVL <span id="m-lvl">1</span></div>
+        <div class="badge">💰 <span id="m-coins">0</span></div>
+        <div class="badge">🔥 <span id="m-streak">0</span></div>
     </div>
-    <button class="host-btn btn" onclick="toggle('dashboard-overlay')">HOST GAME</button>
-    <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button class="btn util" onclick="toggle('shop-overlay')">🛒 SHOP</button>
-        <button class="btn util" onclick="alert('Rules: Host sets the word. Guesser gets 20 tries. Good luck!')">?</button>
+    <button class="btn yes" style="padding: 22px 50px; font-size: 1.2rem; border-radius: 50px;" onclick="nav('dashboard-overlay')">INITIALIZE HOST</button>
+    <div style="margin-top: 25px; display: flex; gap: 12px;">
+        <button class="btn util" onclick="nav('shop-overlay')">🛒 SHOP</button>
+        <button class="btn util" onclick="alert('RULES:\nHost sets word.\nGuesser gets X tries.\nHints cost 5 tries.\nGood luck, Executive.')">?</button>
     </div>
 </div>
 
 <div id="dashboard-overlay" class="overlay hidden">
     <div class="dashboard">
-        <h2 style="margin:0; text-align:center; color: var(--accent);">HOST SETUP</h2>
-        <input type="password" id="wordInput" placeholder="SECRET WORD">
+        <h2 style="font-family:'Orbitron'; text-align:center; color: var(--gold); margin:0;">SETUP ENGINE</h2>
+        <input type="password" id="wordInput" placeholder="ENTER SECRET WORD">
         <select id="startQs">
-            <option value="20">20 Questions</option>
-            <option value="15">15 Questions</option>
-            <option value="10">10 Questions</option>
+            <option value="20">20 QUESTIONS (RECRUIT)</option>
+            <option value="15">15 QUESTIONS (PRO)</option>
+            <option value="10">10 QUESTIONS (LEGEND)</option>
         </select>
-        <div style="display:flex; justify-content: space-between; align-items: center; font-size: 0.8rem; opacity: 0.8;">
-            <span>DOUBLE PENALTY (MAY/DEP)</span>
-            <input type="checkbox" id="checkPenalties" style="width:20px; height:20px;">
+        <div style="display:flex; justify-content: space-between; align-items:center; font-size:0.8rem; opacity:0.7;">
+            <span>HARDCORE PENALTY (MAYBE/DEP = 2)</span>
+            <input type="checkbox" id="penalties" style="width:22px; height:22px;">
         </div>
-        <button class="btn yes" style="padding:15px;" onclick="startGame()">START GAME</button>
-        <button class="btn util" onclick="toggle('dashboard-overlay')">BACK</button>
+        <button class="btn yes" onclick="startGame()">START PRODUCTION</button>
+        <button class="btn util" onclick="nav('dashboard-overlay')">BACK</button>
     </div>
 </div>
 
 <div id="shop-overlay" class="overlay hidden">
-    <h2>SHOP</h2>
-    <p>Coins: <span id="shop-coins">0</span></p>
-    <button class="btn util" style="width:200px; margin:5px;" onclick="buy('avatar', '🤖', 50)">Robot (50c)</button>
-    <button class="btn util" style="width:200px; margin:5px;" onclick="buy('avatar', '👑', 100)">Crown (100c)</button>
-    <button class="btn no" style="width:200px; margin-top:15px;" onclick="toggle('shop-overlay')">EXIT</button>
+    <h2 style="font-family:'Orbitron'">EXECUTIVE SHOP</h2>
+    <div style="display:grid; gap:12px; width:100%; max-width:320px;">
+        <button class="btn util" onclick="buy('avatar', '🤖', 50)">ROBOT (50💰)</button>
+        <button class="btn util" onclick="buy('avatar', '👑', 200)">CROWN (200💰)</button>
+        <button class="btn util" onclick="buy('avatar', '💎', 1000)">DIAMOND (1000💰)</button>
+    </div>
+    <button class="btn no" style="margin-top:30px; width:150px;" onclick="nav('shop-overlay')">EXIT</button>
 </div>
 
 <div id="victory" class="overlay hidden">
-    <h2 id="winStatus">RESULT</h2>
-    <h1 id="finalWordDisplay" style="font-size: 4rem; color: var(--warning);">---</h1>
-    <button class="btn yes" style="width:200px" onclick="location.reload()">PLAY AGAIN</button>
+    <h2 id="winStatus" style="font-family:'Orbitron'; font-size: 2.5rem; margin-bottom:10px;">RESULT</h2>
+    <div id="finalWord" style="font-family:'Orbitron'; font-size: 3.5rem; color: var(--gold);">---</div>
+    <div id="payout" style="margin: 20px 0; font-weight:bold; color: var(--success);"></div>
+    <button class="btn gold-btn" style="width:250px; font-size: 1.2rem;" onclick="location.reload()">REBOOT ENGINE</button>
 </div>
 
 <div class="game-container">
     <div id="guesser-side" class="side">
         <div class="ring-container">
-            <svg><circle class="ring-bg" cx="42" cy="42" r="39"/><circle id="prog-bar" class="ring-bar" cx="42" cy="42" r="39"/></svg>
-            <div style="position:absolute; top:32px; left:0; width:85px; text-align:center; font-weight:bold; font-size:1.2rem;"><span class="q-val">20</span></div>
+            <svg><circle class="ring-bg" cx="55" cy="55" r="50"/><circle id="prog-bar" class="ring-bar" cx="55" cy="55" r="50"/></svg>
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Orbitron'; font-size:1.8rem; font-weight:900;">
+                <span id="q-count">20</span>
+            </div>
         </div>
-        <div id="clue-box">
-            <div id="hint-text" class="hint-text"></div>
-            <div id="reveal-text" class="reveal-text"></div>
+        <div style="text-align:center; margin-top:15px;">
+            <div id="hint-display" style="color:var(--accent); font-size:0.8rem; font-weight:bold; height:1.2rem;"></div>
+            <div id="reveal-display" style="letter-spacing:6px; font-size:1.5rem; font-weight:300;"></div>
         </div>
         <div id="last-answer">READY</div>
     </div>
 
     <div id="host-side" class="side">
-        <div id="peek-area" style="border: 1px solid var(--accent); padding: 12px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer;" 
-             onmousedown="show(true)" onmouseup="show(false)" onmouseleave="show(false)" 
-             ontouchstart="show(true)" ontouchend="show(false)">
-            PEEK: <span id="secret-word-display" style="opacity:0; color:var(--warning); font-weight:bold; transition: opacity 0.2s;">---</span>
+        <div id="peek" style="border: 1px solid var(--accent); padding: 12px 30px; border-radius: 50px; margin-bottom: 20px; font-size: 0.9rem;"
+             onmousedown="show(true)" onmouseup="show(false)" ontouchstart="show(true)" ontouchend="show(false)">
+            PEEK: <span id="peek-word" style="opacity:0; color:var(--gold); font-weight:900; font-family:'Orbitron'; transition:0.2s;">---</span>
         </div>
-        <div class="controls" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 92%; max-width: 400px;">
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; width:92%; max-width:450px;">
             <button class="btn yes" onclick="handle('YES', 'var(--success)')">YES</button>
             <button class="btn no" onclick="handle('NO', 'var(--danger)')">NO</button>
             <button class="btn util" onclick="handle('MAYBE', 'var(--warning)')">MAY</button>
             <button class="btn util" onclick="handle('DEP.', '#3b82f6')">DEP.</button>
-            <button class="btn yes" style="grid-column: span 3; height: 50px;" onclick="end(true)">🏆 GUESSED IT</button>
+            <button class="btn yes" style="grid-column: span 3; height: 60px; font-size: 1.1rem;" onclick="finish(true)">🏆 GUESSED IT</button>
             <button class="btn util" onclick="giveHint()">HINT</button>
             <button class="btn util" style="grid-column: span 2;" onclick="undo()">UNDO</button>
-            <button class="btn util" style="grid-column: span 2;" onclick="location.reload()">QUIT</button>
+            <button class="btn no" style="grid-column: span 2;" onclick="location.reload()">FORFEIT</button>
         </div>
     </div>
 </div>
 
 <script>
-    // FIX: Added try-catch for localStorage to prevent app crash if data is corrupted
-    let data = { xp: 0, lvl: 1, coins: 0, avatar: '👤' };
+    // DATA & STATE
+    let state = { xp: 0, lvl: 1, coins: 0, avatar: '👤', streak: 0 };
     try {
-        const stored = localStorage.getItem('gameData');
-        if (stored) data = JSON.parse(stored);
-    } catch (e) {
-        console.warn("Could not load local storage", e);
+        const saved = localStorage.getItem('supreme_v3');
+        if(saved) state = JSON.parse(saved);
+    } catch(e) {}
+
+    let count, max, word, history = [];
+    const audio = new (window.AudioContext || window.webkitAudioContext)();
+
+    function sfx(f, t, d) {
+        const o = audio.createOscillator(); const g = audio.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, audio.currentTime);
+        g.gain.setValueAtTime(0.1, audio.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
+        o.connect(g); g.connect(audio.destination);
+        o.start(); o.stop(audio.currentTime + d);
     }
 
-    // State Variables
-    let count = 20, maxQ = 20, secret = "";
-    let gameState = { ans: "READY", col: "white", hint: "", reveal: "" };
-    let historyStack = [];
-
-    function save() { 
-        localStorage.setItem('gameData', JSON.stringify(data)); 
-        updateMenu(); 
+    function save() {
+        localStorage.setItem('supreme_v3', JSON.stringify(state));
+        document.getElementById('m-lvl').innerText = state.lvl;
+        document.getElementById('m-coins').innerText = state.coins;
+        document.getElementById('m-streak').innerText = state.streak;
+        document.getElementById('m-avatar').innerText = state.avatar;
     }
-    
-    function updateMenu() {
-        document.getElementById('menu-lvl').innerText = data.lvl;
-        document.getElementById('menu-coins').innerText = data.coins;
-        document.getElementById('shop-coins').innerText = data.coins;
-        document.getElementById('menu-avatar').innerText = data.avatar;
-    }
-    updateMenu();
+    save();
 
-    function toggle(id) { document.getElementById(id).classList.toggle('hidden'); }
-    
-    function buy(type, val, cost) {
-        if(data.coins >= cost) { 
-            data.coins -= cost; 
-            data[type] = val; 
-            save(); 
-            alert("Unlocked!"); 
-        } else {
-            alert("Not enough coins!");
-        }
+    function nav(id) { 
+        sfx(400, 'sine', 0.1);
+        document.getElementById(id).classList.toggle('hidden'); 
     }
 
     function startGame() {
-        secret = document.getElementById('wordInput').value.trim().toUpperCase();
-        if(!secret) return alert("Enter a valid word!");
-        
-        maxQ = parseInt(document.getElementById('startQs').value) || 20;
-        count = maxQ;
-        
-        gameState.reveal = secret.replace(/[A-Z]/g, "_ ");
-        gameState.hint = "";
-        gameState.ans = "READY";
-        gameState.col = "white";
-        historyStack = []; // Reset history
-        
-        document.getElementById('reveal-text').innerText = gameState.reveal;
-        document.getElementById('secret-word-display').innerText = secret;
-        document.getElementById('finalWordDisplay').innerText = secret;
-        
+        word = document.getElementById('wordInput').value.trim().toUpperCase();
+        if(!word) return alert("ENTER A WORD!");
+        max = parseInt(document.getElementById('startQs').value);
+        count = max;
+        document.getElementById('reveal-display').innerText = word.replace(/[A-Z]/g, "_ ");
+        document.getElementById('peek-word').innerText = word;
+        document.getElementById('finalWord').innerText = word;
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('dashboard-overlay').classList.add('hidden');
-        
-        updateUI();
+        sfx(800, 'square', 0.2);
+        update();
     }
 
     function handle(ans, col) {
         if(count <= 0) return;
+        if(navigator.vibrate) navigator.vibrate(ans === 'NO' ? 80 : 30);
         
-        // Save current state BEFORE modifying
-        historyStack.push({
-            count: count,
-            ans: gameState.ans,
-            col: gameState.col,
-            hint: gameState.hint,
-            reveal: gameState.reveal
-        });
-
-        let isDoublePen = document.getElementById('checkPenalties').checked;
-        let cost = (isDoublePen && (ans === 'MAYBE' || ans === 'DEP.')) ? 2 : 1;
-        count = Math.max(0, count - cost);
+        history.push({count, ans: document.getElementById('last-answer').innerText, col: document.getElementById('last-answer').style.color});
+        
+        let pen = document.getElementById('penalties').checked && (ans === 'MAYBE' || ans === 'DEP.') ? 2 : 1;
+        count = Math.max(0, count - pen);
         
         if(ans === 'NO') {
-            const guesser = document.getElementById('guesser-side');
-            guesser.classList.remove('shake-anim');
-            void guesser.offsetWidth; // Trigger reflow to restart animation
-            guesser.classList.add('shake-anim');
-        }
+            sfx(100, 'sawtooth', 0.3);
+            document.getElementById('guesser-side').classList.add('shake');
+            setTimeout(()=>document.getElementById('guesser-side').classList.remove('shake'), 400);
+        } else sfx(600, 'sine', 0.1);
 
-        gameState.ans = ans;
-        gameState.col = col;
-        updateUI();
-        
-        if(count === 0 && ans !== 'YES') {
-            setTimeout(() => end(false), 500); // Slight delay so user sees the 0
-        }
+        document.getElementById('last-answer').innerText = ans;
+        document.getElementById('last-answer').style.color = col;
+        update();
+        if(count === 0 && ans !== 'YES') setTimeout(()=>finish(false), 800);
     }
 
-    function updateUI() {
-        document.querySelectorAll('.q-val').forEach(e => e.innerText = count);
-        
-        const disp = document.getElementById('last-answer');
-        disp.innerText = gameState.ans; 
-        disp.style.color = gameState.col;
-        
-        document.getElementById('hint-text').innerText = gameState.hint;
-        document.getElementById('reveal-text').innerText = gameState.reveal;
-
-        const offset = 245 - (245 * (count / maxQ));
-        document.getElementById('prog-bar').style.strokeDashoffset = offset;
+    function update() {
+        document.getElementById('q-count').innerText = count;
+        const offset = 314 - (314 * (count / max));
+        const bar = document.getElementById('prog-bar');
+        bar.style.strokeDashoffset = offset;
+        bar.style.stroke = count < 5 ? 'var(--danger)' : 'var(--accent)';
     }
 
     function undo() {
-        if(historyStack.length === 0) return;
-        const last = historyStack.pop();
-        
+        if(!history.length) return;
+        const last = history.pop();
         count = last.count;
-        gameState.ans = last.ans;
-        gameState.col = last.col;
-        gameState.hint = last.hint;
-        gameState.reveal = last.reveal;
-        
-        updateUI();
+        document.getElementById('last-answer').innerText = last.ans;
+        document.getElementById('last-answer').style.color = last.col;
+        update();
     }
 
     function giveHint() {
-        if(count < 5) return alert("Need at least 5 Questions for a hint!");
-        const h = prompt("Enter a short hint:");
+        if(count < 5) return alert("INSUFFICIENT CHARGES (5 REQ)");
+        const h = prompt("TRANSMIT HINT:");
         if(h) {
-            historyStack.push({ count, ...gameState }); // Copy current state
             count -= 5;
-            gameState.hint = "HINT: " + h.toUpperCase();
-            gameState.ans = "HINT";
-            gameState.col = "var(--accent)";
-            updateUI();
-            
-            if(count === 0) setTimeout(() => end(false), 500);
+            document.getElementById('hint-display').innerText = "HINT: " + h.toUpperCase();
+            sfx(1000, 'sine', 0.4);
+            update();
         }
     }
 
-    function end(won) {
+    function finish(won) {
+        const status = document.getElementById('winStatus');
+        const pay = document.getElementById('payout');
         if(won) {
-            data.coins += 20; 
-            data.xp += 50;
-            if(data.xp >= data.lvl * 100) { 
-                data.lvl++; 
-                data.xp = 0; 
-            }
-            save();
-            document.getElementById('winStatus').innerText = "VICTORY";
-            document.getElementById('winStatus').style.color = "var(--success)";
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#8b5cf6', '#fbbf24', '#22c55e'] });
+            state.coins += 50; state.xp += 100; state.streak++;
+            status.innerText = "VICTORY"; status.style.color = "var(--success)";
+            pay.innerText = "+50 COINS | +100 XP | STREAK: " + state.streak;
+            sfx(880, 'sine', 0.2);
         } else {
-            document.getElementById('winStatus').innerText = "DEFEAT";
-            document.getElementById('winStatus').style.color = "var(--danger)";
+            state.streak = 0;
+            status.innerText = "DEFEAT"; status.style.color = "var(--danger)";
+            pay.innerText = "STREAK RESET";
+            sfx(100, 'sawtooth', 0.6);
         }
+        if(state.xp >= state.lvl * 200) { state.lvl++; state.xp = 0; }
+        save();
         document.getElementById('victory').classList.remove('hidden');
     }
 
-    function show(isVisible) { 
-        document.getElementById('secret-word-display').style.opacity = isVisible ? 1 : 0; 
+    function buy(t, v, c) {
+        if(state.coins >= c) { state.coins -= c; state[t] = v; save(); sfx(1200, 'sine', 0.2); alert("UNLOCKED!"); }
+        else alert("INSUFFICIENT 💰");
     }
+
+    function show(v) { document.getElementById('peek-word').style.opacity = v ? 1 : 0; }
 </script>
 </body>
 </html>
