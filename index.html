@@ -3,94 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20? ULTRA THIN</title>
+    <title>20? REFINED CLARITY</title>
     <style>
         :root {
-            --bg: #020617; --card: rgba(15, 23, 42, 0.95);
+            --bg: #020617; --card: rgba(15, 23, 42, 0.98);
             --accent: #c084fc; --success: #22c55e; --danger: #ef4444;
             --warning: #f59e0b; --info: #3b82f6; --text: #ffffff;
             --grad: linear-gradient(180deg, #0f172a 0%, #020617 100%);
         }
 
         .theme-sunset { --bg: #450a0a; --accent: #fbbf24; --grad: linear-gradient(180deg, #7c2d12 0%, #450a0a 100%); }
-        .theme-void { --bg: #000000; --accent: #ffffff; --grad: linear-gradient(180deg, #111 0%, #000 100%); }
-        .theme-ghost { --bg: #f8fafc; --accent: #0f172a; --text: #0f172a; --grad: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%); }
+        .theme-void { --bg: #000; --accent: #fff; --grad: linear-gradient(180deg, #111 0%, #000 100%); }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 100; } /* Global Ultra Thin */
-        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', 'Helvetica Neue', sans-serif; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
 
         .game-container { display: flex; flex-direction: column; height: 100dvh; background: var(--grad); transition: 0.8s; }
         .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        #guesser-side { transform: rotate(180deg); border-bottom: 0.5px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
+        #guesser-side { transform: rotate(180deg); border-bottom: 0.5px solid rgba(255,255,255,0.2); backdrop-filter: blur(25px); }
 
-        /* ULTRA THIN ANSWER DISPLAY */
-        #last-ans { 
-            font-size: 4.5rem; 
-            font-weight: 100; 
-            letter-spacing: 4px; 
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
+        /* TYPOGRAPHY */
+        h1 { font-weight: 100; font-size: 6rem; letter-spacing: -10px; margin: 0; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .stats-label { font-size: 0.7rem; letter-spacing: 3px; font-weight: 300; opacity: 0.7; text-transform: uppercase; }
+        #last-ans { font-size: 4.5rem; font-weight: 100; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
 
-        /* BUTTONS - Retaining bold for legibility/usability */
-        .btn { border: none; border-radius: 12px; font-weight: 400; color: white; cursor: pointer; transition: 0.3s; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
-        .btn:active { transform: scale(0.96); opacity: 0.7; }
-        .yes { background: var(--success); }
-        .no { background: var(--danger); }
-        .util { background: transparent; border: 0.5px solid rgba(255,255,255,0.2); color: var(--text); }
-        .host-prime { border: 0.5px solid var(--accent); color: var(--accent); padding: 15px 60px; border-radius: 50px; font-size: 1.1rem; }
+        /* BUTTONS */
+        .btn { border: none; border-radius: 12px; font-weight: 400; color: white; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn:active { transform: scale(0.96); opacity: 0.8; }
+        .yes { background: var(--success); } .no { background: var(--danger); }
+        .util { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.2); color: var(--text); }
+        .host-prime { border: 1px solid var(--accent); color: var(--accent); padding: 15px 50px; border-radius: 50px; font-size: 1.1rem; text-decoration: none; display: inline-block; text-align: center; }
+
+        /* CUSTOM SHOP ICON */
+        .shop-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; vertical-align: middle; }
 
         /* OVERLAYS */
-        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; transition: 0.6s cubic-bezier(0.2, 1, 0.2, 1); }
-        .hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
-        .card { width: 100%; max-width: 380px; padding: 30px; border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 20px; text-align: center; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; transition: 0.5s; }
+        .hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
+        .card { width: 100%; max-width: 380px; padding: 35px; border-radius: 25px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 20px; text-align: center; }
 
-        /* SHOP */
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 40vh; overflow-y: auto; }
-        .shop-item { padding: 15px; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; }
-        .shop-item:hover { border-color: var(--accent); }
-        .shop-item b { display: block; font-weight: 400; margin-bottom: 4px; }
-
-        /* VITALS */
-        .ring-svg { width: 80px; height: 80px; transform: rotate(-90deg); }
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2; }
-        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 251; stroke-dashoffset: 0; transition: 1.5s ease; }
+        input { background: rgba(255,255,255,0.05); border: none; border-bottom: 1px solid var(--accent); color: #fff; padding: 15px; font-size: 1.3rem; text-align: center; font-weight: 200; border-radius: 10px 10px 0 0; width: 100%; }
         
-        input { background: transparent; border: none; border-bottom: 0.5px solid var(--accent); color: var(--text); padding: 10px; font-size: 1.2rem; text-align: center; font-weight: 100; width: 100%; }
-        
-        #p-title { letter-spacing: 5px; font-size: 0.7rem; opacity: 0.6; margin-bottom: 5px; }
-        .stats-label { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.4; text-transform: uppercase; }
+        .ring-svg { width: 85px; height: 85px; transform: rotate(-90deg); filter: drop-shadow(0 0 5px var(--accent)); }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 3; }
+        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 251; stroke-dashoffset: 0; transition: 1s ease-out; }
     </style>
 </head>
 <body>
 
 <div id="m-menu" class="overlay">
-    <div id="p-title">LOADING CAREER...</div>
-    <h1 style="font-size: 6rem; margin: 0; letter-spacing: -10px; font-weight: 100;">20?</h1>
-    <div style="margin: 30px 0; font-size: 0.9rem; letter-spacing: 2px;">
-        <span id="p-av">👤</span> LVL <span id="p-lv">1</span> — 💰 <span id="p-co">0</span>
+    <div id="p-title" class="stats-label" style="color:var(--accent)">BOUTIQUE EDITION</div>
+    <h1>20?</h1>
+    <div style="margin: 25px 0; font-weight: 200; letter-spacing: 2px;">
+        <span id="p-av">👤</span> <span style="opacity:0.4; margin:0 10px;">|</span> 💰 <span id="p-co">0</span>
     </div>
-    <button class="btn host-prime" onclick="view('d-dash')">NEW SESSION</button>
-    <div style="margin-top: 25px; display: flex; gap: 20px;">
-        <div onclick="view('sh-shop')" style="cursor:pointer" class="stats-label">Boutique</div>
-        <div onclick="cycleTheme()" style="cursor:pointer" class="stats-label">Appearance</div>
+    <button class="btn host-prime" onclick="view('d-dash')">HOST SESSION</button>
+    
+    <div style="margin-top: 40px; display: flex; gap: 30px; align-items: center;">
+        <div onclick="view('sh-shop')" style="cursor:pointer; display: flex; align-items: center; gap: 8px;" class="stats-label">
+            <svg class="shop-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            Boutique
+        </div>
+        <div onclick="view('o-settings')" style="cursor:pointer; font-size: 1.5rem;">⚙️</div>
+        <div onclick="cycleTheme()" style="cursor:pointer" class="stats-label">Visuals</div>
+    </div>
+</div>
+
+<div id="o-settings" class="overlay hidden">
+    <div class="card">
+        <div class="stats-label">Settings</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="stats-label">Vibration</span>
+            <input type="checkbox" id="s-vib" checked style="width:20px; height:20px;">
+        </div>
+        <button class="btn host-prime" onclick="view('m-menu')">Apply</button>
     </div>
 </div>
 
 <div id="sh-shop" class="overlay hidden">
     <div class="card">
-        <div class="stats-label">Marketplace</div>
-        <div class="shop-grid">
-            <div class="shop-item" onclick="buy('av', '🥷', 50)"><b>🥷</b> 50</div>
-            <div class="shop-item" onclick="buy('av', '👾', 50)"><b>👾</b> 50</div>
-            <div class="shop-item" onclick="buy('th', 'sunset', 100)"><b>🌅</b> 100</div>
-            <div class="shop-item" onclick="buy('th', 'void', 300)"><b>🌑</b> 300</div>
-            <div class="shop-item" onclick="buy('th', 'ghost', 500)"><b>👻</b> 500</div>
-            <div class="shop-item" onclick="buy('ti', 'THE GHOST', 200)"><b>GHOST</b> 200</div>
-            <div class="shop-item" onclick="buy('ti', 'SOVEREIGN', 800)"><b>KING</b> 800</div>
-            <div class="shop-item" onclick="buy('av', '💎', 1000)"><b>💎</b> 1000</div>
+        <div class="stats-label">Boutique — 💰 <span id="sh-co">0</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-height: 40vh; overflow-y: auto;">
+            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('av', '🥷', 50)"><b>🥷</b> 50</div>
+            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('th', 'sunset', 100)"><b>🌅</b> 100</div>
+            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('ti', 'THE SEER', 150)"><b>SEER</b> 150</div>
+            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('av', '💎', 1000)"><b>💎</b> 1000</div>
         </div>
-        <button class="btn util" style="padding:12px" onclick="view('m-menu')">Back</button>
+        <button class="btn util" style="padding:15px" onclick="view('m-menu')">Back</button>
     </div>
 </div>
 
@@ -100,64 +99,51 @@
         <input type="password" id="wIn" placeholder="SECRET WORD">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
             <span class="stats-label">Max Turns</span>
-            <input type="number" id="qIn" value="20" style="width:50px; font-size:0.9rem;">
+            <input type="number" id="qIn" value="20" style="width:60px; border:none; border-bottom:1px solid #444; background:transparent; color:#fff;">
         </div>
         <button class="btn host-prime" onclick="launch()">Initialize</button>
         <button class="btn util" style="border:none" onclick="view('m-menu')">Cancel</button>
     </div>
 </div>
 
-<div id="v-win" class="overlay hidden">
-    <h1 id="win-t" style="font-size: 4rem; margin:0;">-</h1>
-    <h2 id="win-w" style="font-size: 2rem; color: var(--accent); margin: 10px 0;">-</h2>
-    <p id="win-r" class="stats-label"></p>
-    <button class="btn host-prime" onclick="location.reload()">Re-Initialize</button>
-</div>
-
 <div class="game-container">
     <div id="guesser-side" class="side">
         <div style="position: relative;">
-            <svg class="ring-svg"><circle class="ring-bg" cx="40" cy="40" r="38"/><circle id="r-fill" class="ring-fill" cx="40" cy="40" r="38"/></svg>
-            <div style="position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:1.2rem;" id="q-val">20</div>
+            <svg class="ring-svg"><circle class="ring-bg" cx="42" cy="42" r="40"/><circle id="r-fill" class="ring-fill" cx="42" cy="42" r="40"/></svg>
+            <div style="position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:1.5rem; font-weight:100;" id="q-val">20</div>
         </div>
-        <div style="margin-top: 30px; text-align: center;">
-            <div id="h-lab" style="font-size: 0.6rem; color: var(--accent); letter-spacing: 2px; height:12px;"></div>
-            <div id="bl" style="letter-spacing: 8px; font-size: 1.1rem; margin-top:8px; opacity:0.4;"></div>
+        <div style="margin-top: 40px; text-align: center;">
+            <div id="h-lab" class="stats-label" style="color:var(--accent); height:15px;"></div>
+            <div id="bl" style="letter-spacing: 10px; font-size: 1.2rem; margin-top:10px; opacity:0.5; font-weight:200;"></div>
         </div>
         <div id="last-ans">READY</div>
     </div>
 
     <div id="host-side" class="side">
-        <div id="pk-btn" style="margin-bottom: 40px; cursor: pointer;" onmousedown="pk(1)" onmouseup="pk(0)" ontouchstart="pk(1)" ontouchend="pk(0)">
-            <span class="stats-label" style="border:0.5px solid var(--accent); padding:8px 20px; border-radius:20px;">Reveal: <span id="pk-w" style="opacity:0;">-</span></span>
+        <div style="margin-bottom: 45px; cursor: pointer;" onmousedown="pk(1)" onmouseup="pk(0)" ontouchstart="pk(1)" ontouchend="pk(0)">
+            <span class="stats-label" style="border:1px solid rgba(255,255,255,0.2); padding:10px 25px; border-radius:30px;">Reveal: <span id="pk-w" style="opacity:0; color:var(--accent);">?</span></span>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 85%; max-width: 400px;">
-            <button class="btn yes" style="height:55px" onclick="hit('YES', 'var(--success)')">Yes</button>
-            <button class="btn no" style="height:55px" onclick="hit('NO', 'var(--danger)')">No</button>
-            <button class="btn util" style="height:55px" onclick="hit('MAYBE', 'var(--warning)')">May</button>
-            <button class="btn util" style="height:55px" onclick="hit('DEP.', 'var(--info)')">Dep.</button>
-            <button class="btn util" style="grid-column: span 3; height: 60px; font-size: 1rem; letter-spacing: 2px;" onclick="finish(1)">Correct Guess</button>
-            <button class="btn util" style="height:60px" onclick="addHint()">Hint</button>
-            <div style="grid-column: span 4; display:flex; justify-content:space-between; margin-top:10px;">
-                <span class="stats-label" onclick="undo()">[Undo]</span>
-                <span class="stats-label" onclick="location.reload()">[Exit]</span>
-            </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 90%; max-width: 420px;">
+            <button class="btn yes" style="height:60px" onclick="hit('YES', 'var(--success)')">Yes</button>
+            <button class="btn no" style="height:60px" onclick="hit('NO', 'var(--danger)')">No</button>
+            <button class="btn util" style="height:60px; color:var(--warning)" onclick="hit('MAYBE', 'var(--warning)')">May</button>
+            <button class="btn util" style="height:60px; color:var(--info)" onclick="hit('DEP.', 'var(--info)')">Dep.</button>
+            <button class="btn host-prime" style="grid-column: span 3; height: 65px;" onclick="finish(1)">Correct Guess</button>
+            <button class="btn util" style="height:65px" onclick="addHint()">Hint</button>
         </div>
     </div>
 </div>
 
 <script>
     const def = { xp: 0, lvl: 1, co: 0, th: 'cyber', av: '👤', ti: 'THE NOVICE', inv: ['👤', 'THE NOVICE', 'cyber'] };
-    let st = JSON.parse(localStorage.getItem('20q-ultra')) || def;
+    let st = JSON.parse(localStorage.getItem('20q-clarity-v2')) || def;
     let cur, tot, sec = "", hist = [];
 
     function save() { 
-        localStorage.setItem('20q-ultra', JSON.stringify(st)); 
-        document.getElementById('p-lv').innerText = st.lvl;
+        localStorage.setItem('20q-clarity-v2', JSON.stringify(st)); 
         document.getElementById('p-co').innerText = st.co;
         document.getElementById('sh-co').innerText = st.co;
         document.getElementById('p-av').innerText = st.av;
-        document.getElementById('p-title').innerText = st.ti;
     }
 
     function view(id) { 
@@ -166,7 +152,7 @@
     }
 
     function cycleTheme() {
-        const ths = ['cyber', 'sunset', 'void', 'ghost'];
+        const ths = ['cyber', 'sunset', 'void'];
         st.th = ths[(ths.indexOf(st.th) + 1) % ths.length];
         applyTheme(); save();
     }
@@ -184,16 +170,15 @@
         tot = parseInt(document.getElementById('qIn').value) || 20;
         cur = tot;
         document.getElementById('pk-w').innerText = sec;
-        document.getElementById('win-w').innerText = sec;
         document.getElementById('bl').innerText = sec.replace(/[A-Z]/g, "_ ");
         view('none'); upd();
     }
 
     function hit(a, c) {
         if(cur <= 0) return;
+        if(document.getElementById('s-vib').checked && navigator.vibrate) navigator.vibrate(25);
         hist.push({a: document.getElementById('last-ans').innerText, c: document.getElementById('last-ans').style.color, cur, h: document.getElementById('h-lab').innerText});
         cur--;
-        if(cur <= 5) document.getElementById('h-lab').innerText = "CLUE: " + sec[0];
         upd(a, c);
         if(cur === 0 && a !== 'YES') finish(0);
     }
@@ -205,31 +190,17 @@
         document.getElementById('r-fill').style.strokeDashoffset = 251 - (251 * (cur / tot));
     }
 
-    function undo() {
-        if(!hist.length) return;
-        const p = hist.pop(); cur = p.cur;
-        document.getElementById('h-lab').innerText = p.h;
-        upd(p.a, p.c);
-    }
-
     function addHint() {
         if(cur < 5) return;
-        let h = prompt("Hint:");
+        let h = prompt("Secure Hint:");
         if(h) { cur -= 5; document.getElementById('h-lab').innerText = "HINT: " + h.toUpperCase(); upd("HINT", "var(--accent)"); }
     }
 
     function pk(v) { document.getElementById('pk-w').style.opacity = v ? 1 : 0; }
 
     function finish(w) {
-        const t = document.getElementById('win-t');
-        if(w) {
-            t.innerText = "SUCCESS"; t.style.color = "var(--success)";
-            st.co += 30; st.xp += 50; if(st.xp >= st.lvl*100) { st.lvl++; st.xp=0; }
-            document.getElementById('win-r').innerText = "+30 CREDITS";
-        } else {
-            t.innerText = "FAILURE"; t.style.color = "var(--danger)";
-        }
-        save(); view('v-win');
+        if(w) { st.co += 35; alert("SUCCESS: +35 CREDITS"); }
+        save(); location.reload();
     }
 
     applyTheme(); save();
