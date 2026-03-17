@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20? SUPREME ENGINE v3.1</title>
+    <title>20? SUPREME ENGINE v4.0 | BOARDROOM</title>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #020617; --glass: rgba(255, 255, 255, 0.03);
+            --bg: #020617; --panel: #0f172a; --glass: rgba(255, 255, 255, 0.05);
             --accent: #8b5cf6; --success: #22c55e; --danger: #ef4444;
             --warning: #f59e0b; --text: #f8fafc; --gold: #fbbf24;
         }
+
+        /* UI SKINS */
+        .skin-cyber { --accent: #06b6d4; }
+        .skin-blood { --accent: #f43f5e; }
+        .skin-gold { --accent: #fbbf24; }
 
         body, html { 
             margin: 0; padding: 0; height: 100dvh; font-family: 'Inter', sans-serif;
@@ -21,278 +26,301 @@
             user-select: none; -webkit-user-select: none;
         }
 
-        /* Animated Nebula Background */
-        .nebula {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 20% 30%, #1e1b4b 0%, #020617 100%);
-        }
-        .nebula::before {
-            content: ""; position: absolute; inset: 0;
-            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.2; animation: drift 60s linear infinite;
-        }
-        @keyframes drift { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-
-        /* Component Styling */
-        .game-container { display: flex; flex-direction: column; height: 100dvh; }
-        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transition: 0.5s ease; }
-        
-        #guesser-side { 
-            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px);
-            transform: rotate(180deg); border-bottom: 2px solid var(--accent);
+        /* High-Density Overlay to fix "Seeing the game under it" */
+        .overlay { 
+            position: fixed; inset: 0; z-index: 1000; 
+            background: var(--bg); /* Solid background */
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 20px; transition: 0.3s ease;
         }
 
         .dashboard {
-            background: rgba(15, 23, 42, 0.95); width: 85%; max-width: 400px; padding: 30px;
-            border-radius: 32px; border: 2px solid var(--accent);
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
-            display: flex; flex-direction: column; gap: 15px;
+            background: var(--panel); width: 90%; max-width: 450px; padding: 25px;
+            border-radius: 28px; border: 1px solid var(--accent);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; gap: 12px;
+            max-height: 85vh; overflow-y: auto;
         }
 
-        .ring-container { position: relative; width: 110px; height: 110px; }
-        .ring-container svg { transform: rotate(-90deg); width: 110px; height: 110px; }
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 10; }
-        .ring-bar { 
-            fill: none; stroke: var(--accent); stroke-width: 10; 
-            stroke-dasharray: 314; stroke-dashoffset: 0; 
-            transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); stroke-linecap: round; 
-        }
+        .game-container { display: flex; flex-direction: column; height: 100dvh; }
+        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        
+        #guesser-side { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); transform: rotate(180deg); border-bottom: 2px solid var(--accent); }
+
+        .ring-container { position: relative; width: 100px; height: 100px; margin-bottom: 10px; }
+        .ring-bar { fill: none; stroke: var(--accent); stroke-width: 8; stroke-dasharray: 283; stroke-dashoffset: 0; transition: 0.5s; stroke-linecap: round; }
+        .ring-bg { fill: none; stroke: var(--glass); stroke-width: 8; }
 
         .btn { 
-            padding: 16px; border: none; border-radius: 18px; font-weight: 800; 
+            padding: 14px; border: none; border-radius: 14px; font-weight: 900; 
             color: white; cursor: pointer; touch-action: manipulation;
-            transition: all 0.2s; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.8rem;
+            transition: 0.1s; font-family: 'Orbitron'; font-size: 0.75rem;
+            text-transform: uppercase;
         }
-        .btn:active { transform: scale(0.92); filter: brightness(1.3); }
-        .yes { background: var(--success); box-shadow: 0 5px 0 #15803d; }
-        .no { background: var(--danger); box-shadow: 0 5px 0 #991b1b; }
-        .util { background: #334155; box-shadow: 0 5px 0 #1e293b; }
-        .gold-btn { background: var(--gold); color: #000; box-shadow: 0 5px 0 #b45309; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .yes { background: var(--success); } .no { background: var(--danger); } .util { background: #334155; }
+        .gold-btn { background: var(--gold); color: #000; }
 
-        .overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.97); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .log-container { 
+            position: absolute; left: 10px; top: 10px; bottom: 10px; width: 60px; 
+            background: var(--glass); border-radius: 10px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 4px; padding: 5px;
+        }
+        .log-item { font-size: 0.6rem; padding: 4px; border-radius: 4px; text-align: center; font-weight: bold; }
+
         .hidden { display: none !important; }
-        
-        input, select { background: var(--glass); border: 2px solid var(--accent); color: white; padding: 18px; border-radius: 14px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box; }
-        
-        #last-answer { font-family: 'Orbitron'; font-size: 4.5rem; font-weight: 900; margin: 10px 0; letter-spacing: -2px; }
-        
-        .badge-row { display: flex; gap: 8px; margin-bottom: 25px; }
-        .badge { background: var(--glass); padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); }
-        
-        @keyframes shake { 0%, 100% { transform: rotate(180deg) translate(0); } 20% { transform: rotate(180deg) translate(-12px); } 80% { transform: rotate(180deg) translate(12px); } }
-        .shake { animation: shake 0.2s ease-in-out 2; }
+        input, select { background: #1e293b; border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 10px; font-size: 14px; }
+        label { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-top: 5px; }
+
+        #reveal-text { font-family: 'Orbitron'; font-size: 1.4rem; letter-spacing: 4px; margin: 10px 0; }
+        #last-ans { font-family: 'Orbitron'; font-size: 3.5rem; font-weight: 900; line-height: 1; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
-<div class="nebula"></div>
-
-<div id="main-menu" class="overlay">
-    <h1 style="font-family: 'Orbitron'; font-size: 5rem; margin: 0; color: var(--accent); letter-spacing: -5px;">20<span style="color:white">?</span></h1>
-    <div class="badge-row">
-        <div class="badge"><span id="m-avatar">👤</span></div>
-        <div class="badge">LVL <span id="m-lvl">1</span></div>
-        <div class="badge">💰 <span id="m-coins">0</span></div>
-        <div class="badge">🔥 <span id="m-streak">0</span></div>
-    </div>
-    <button class="btn yes" style="padding: 22px 50px; font-size: 1.2rem; border-radius: 50px;" onclick="nav('dashboard-overlay')">INITIALIZE HOST</button>
-    <div style="margin-top: 25px; display: flex; gap: 12px;">
-        <button class="btn util" onclick="nav('shop-overlay')">🛒 SHOP</button>
-        <button class="btn util" onclick="alert('RULES:\nHost sets word.\nGuesser gets X tries.\nHints cost 5 tries.\nGood luck, Executive.')">?</button>
-    </div>
-</div>
-
-<div id="dashboard-overlay" class="overlay hidden">
-    <div class="dashboard">
-        <h2 style="font-family:'Orbitron'; text-align:center; color: var(--gold); margin:0;">SETUP ENGINE</h2>
-        <input type="password" id="wordInput" placeholder="ENTER SECRET WORD">
-        <select id="startQs">
-            <option value="20">20 QUESTIONS (RECRUIT)</option>
-            <option value="15">15 QUESTIONS (PRO)</option>
-            <option value="10">10 QUESTIONS (LEGEND)</option>
-        </select>
-        <div style="display:flex; justify-content: space-between; align-items:center; font-size:0.8rem; opacity:0.7;">
-            <span>HARDCORE PENALTY (MAYBE/DEP = 2)</span>
-            <input type="checkbox" id="penalties" style="width:22px; height:22px;">
+<div id="menu" class="overlay">
+    <div style="font-family: 'Orbitron'; font-size: 4rem; color: var(--accent); margin-bottom: 5px;">20<span style="color:white">?</span></div>
+    <div style="display:flex; gap:10px; margin-bottom: 30px;">
+        <div style="background:var(--glass); padding:5px 15px; border-radius:20px; font-size:0.8rem;">
+            <span id="m-avatar">👤</span> LVL <span id="m-lvl">1</span> | 💰 <span id="m-coins">0</span>
         </div>
-        <button class="btn yes" onclick="startGame()">START PRODUCTION</button>
-        <button class="btn util" onclick="nav('dashboard-overlay')">BACK</button>
+    </div>
+    <button class="btn yes" style="padding: 20px 60px; border-radius: 50px; font-size: 1rem;" onclick="toggle('setup')">START SESSION</button>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button class="btn util" onclick="toggle('shop')">🛒 SHOP</button>
+        <button class="btn util" onclick="alert('Host sets the game parameters. Guesser attempts to breach.')">?</button>
     </div>
 </div>
 
-<div id="shop-overlay" class="overlay hidden">
-    <h2 style="font-family:'Orbitron'">EXECUTIVE SHOP</h2>
-    <div style="display:grid; gap:12px; width:100%; max-width:320px;">
-        <button class="btn util" onclick="buy('avatar', '🤖', 50)">ROBOT (50💰)</button>
-        <button class="btn util" onclick="buy('avatar', '👑', 200)">CROWN (200💰)</button>
-        <button class="btn util" onclick="buy('avatar', '💎', 1000)">DIAMOND (1000💰)</button>
+<div id="setup" class="overlay hidden">
+    <div class="dashboard">
+        <h2 style="font-family:'Orbitron'; margin:0; color:var(--accent);">SETUP ENGINE</h2>
+        
+        <label>SECRET WORD / PHRASE</label>
+        <input type="password" id="wordIn" placeholder="e.g. ELON MUSK">
+        
+        <label>CATEGORY (Visible to Guesser)</label>
+        <input type="text" id="catIn" placeholder="e.g. FAMOUS PEOPLE">
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
+                <label>ATTEMPTS</label>
+                <select id="qIn"><option value="20">20</option><option value="15">15</option><option value="10">10</option></select>
+            </div>
+            <div>
+                <label>HINT LIMIT</label>
+                <select id="hIn"><option value="3">3 Hints</option><option value="1">1 Hint</option><option value="0">None</option><option value="99">Unlimited</option></select>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <span style="font-size:0.7rem;">PENALTY MODE (MAY/DEP = 2)</span>
+            <input type="checkbox" id="penIn" style="width:20px; height:20px;">
+        </div>
+
+        <button class="btn yes" style="margin-top:10px;" onclick="initGame()">DEPLOY ENGINE</button>
+        <button class="btn util" onclick="toggle('setup')">CANCEL</button>
     </div>
-    <button class="btn no" style="margin-top:30px; width:150px;" onclick="nav('shop-overlay')">EXIT</button>
 </div>
 
-<div id="victory" class="overlay hidden">
-    <h2 id="winStatus" style="font-family:'Orbitron'; font-size: 2.5rem; margin-bottom:10px;">RESULT</h2>
-    <div id="finalWord" style="font-family:'Orbitron'; font-size: 3.5rem; color: var(--gold);">---</div>
-    <div id="payout" style="margin: 20px 0; font-weight:bold; color: var(--success);"></div>
-    <button class="btn gold-btn" style="width:250px; font-size: 1.2rem;" onclick="location.reload()">REBOOT ENGINE</button>
+<div id="shop" class="overlay hidden">
+    <div class="dashboard">
+        <h2 style="font-family:'Orbitron'; color:var(--gold);">BLACK MARKET</h2>
+        <p style="font-size:0.8rem;">COINS: <span id="s-coins">0</span></p>
+        
+        <label>AVATARS</label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <button class="btn util" onclick="buy('avatar', '🤖', 50)">ROBOT (50)</button>
+            <button class="btn util" onclick="buy('avatar', '👑', 200)">KING (200)</button>
+            <button class="btn util" onclick="buy('avatar', '💎', 500)">ELITE (500)</button>
+            <button class="btn util" onclick="buy('avatar', '🔥', 1000)">LEGEND (1K)</button>
+        </div>
+
+        <label>UI SKINS</label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <button class="btn util" onclick="setSkin('skin-cyber')">CYBER BLUE</button>
+            <button class="btn util" onclick="setSkin('skin-blood')">BLOOD RED</button>
+            <button class="btn util" onclick="setSkin('skin-gold')">GOLDEN AGE</button>
+            <button class="btn util" onclick="setSkin('')">DEFAULT</button>
+        </div>
+
+        <button class="btn no" style="margin-top:15px;" onclick="toggle('shop')">EXIT</button>
+    </div>
+</div>
+
+<div id="result" class="overlay hidden">
+    <h1 id="r-status" style="font-family:'Orbitron'; font-size:3rem;">VICTORY</h1>
+    <div id="r-word" style="font-family:'Orbitron'; font-size:2rem; color:var(--gold);">---</div>
+    <div id="r-payout" style="margin:20px 0; font-weight:bold;"></div>
+    <button class="btn yes" style="padding:15px 40px;" onclick="location.reload()">RESTART ENGINE</button>
 </div>
 
 <div class="game-container">
     <div id="guesser-side" class="side">
+        <div class="log-container" id="game-log"></div>
         <div class="ring-container">
-            <svg><circle class="ring-bg" cx="55" cy="55" r="50"/><circle id="prog-bar" class="ring-bar" cx="55" cy="55" r="50"/></svg>
-            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Orbitron'; font-size:1.8rem; font-weight:900;">
-                <span id="q-count">20</span>
+            <svg viewBox="0 0 100 100">
+                <circle class="ring-bg" cx="50" cy="50" r="45"/>
+                <circle id="prog" class="ring-bar" cx="50" cy="50" r="45"/>
+            </svg>
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Orbitron'; font-weight:900;">
+                <span id="q-val">20</span>
             </div>
         </div>
-        <div style="text-align:center; margin-top:15px;">
-            <div id="hint-display" style="color:var(--accent); font-size:0.8rem; font-weight:bold; height:1.2rem;"></div>
-            <div id="reveal-display" style="letter-spacing:6px; font-size:1.5rem; font-weight:300;"></div>
+        <div style="text-align:center;">
+            <div id="cat-text" style="color:var(--accent); font-size:0.6rem; font-weight:bold; text-transform:uppercase;">CATEGORY</div>
+            <div id="reveal-text">_ _ _ _ _</div>
+            <div id="hint-msg" style="color:var(--gold); font-size:0.7rem; font-weight:bold; height:1rem;"></div>
         </div>
-        <div id="last-answer">READY</div>
+        <div id="last-ans">READY</div>
     </div>
 
     <div id="host-side" class="side">
-        <div id="peek" style="border: 1px solid var(--accent); padding: 12px 30px; border-radius: 50px; margin-bottom: 20px; font-size: 0.9rem;"
-             onmousedown="show(true)" onmouseup="show(false)" ontouchstart="show(true)" ontouchend="show(false)">
-            PEEK: <span id="peek-word" style="opacity:0; color:var(--gold); font-weight:900; font-family:'Orbitron'; transition:0.2s;">---</span>
-        </div>
-        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; width:92%; max-width:450px;">
-            <button class="btn yes" onclick="handle('YES', 'var(--success)')">YES</button>
-            <button class="btn no" onclick="handle('NO', 'var(--danger)')">NO</button>
-            <button class="btn util" onclick="handle('MAYBE', 'var(--warning)')">MAY</button>
-            <button class="btn util" onclick="handle('DEP.', '#3b82f6')">DEP.</button>
-            <button class="btn yes" style="grid-column: span 3; height: 60px; font-size: 1.1rem;" onclick="finish(true)">🏆 GUESSED IT</button>
-            <button class="btn util" onclick="giveHint()">HINT</button>
-            <button class="btn util" style="grid-column: span 2;" onclick="undo()">UNDO</button>
-            <button class="btn no" style="grid-column: span 2;" onclick="location.reload()">FORFEIT</button>
+        <div id="host-panel" style="background:var(--panel); width:90%; padding:15px; border-radius:20px; border:1px solid var(--accent); display:flex; flex-direction:column; align-items:center; gap:10px;">
+            <div id="peek-btn" style="background:var(--glass); padding:10px 30px; border-radius:50px; font-size:0.8rem; cursor:pointer;"
+                 onmousedown="peek(1)" onmouseup="peek(0)" ontouchstart="peek(1)" ontouchend="peek(0)">
+                SCAN ENCRYPTION: <span id="peek-val" style="opacity:0; color:var(--gold); font-weight:bold; transition:0.2s;">---</span>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; width:100%;">
+                <button class="btn yes" onclick="act('YES', 'var(--success)')">YES</button>
+                <button class="btn no" onclick="act('NO', 'var(--danger)')">NO</button>
+                <button class="btn util" onclick="act('MAYBE', 'var(--warning)')">MAY</button>
+                <button class="btn util" onclick="act('DEP.', '#3b82f6')">DEP</button>
+                
+                <button class="btn yes" style="grid-column: span 2;" onclick="over(1)">🏆 GUESSED</button>
+                <button class="btn gold-btn" id="hint-btn" onclick="sendHint()">HINT (<span id="h-count">3</span>)</button>
+                <button class="btn util" onclick="undo()">UNDO</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // DATA & STATE
-    let state = { xp: 0, lvl: 1, coins: 0, avatar: '👤', streak: 0 };
-    try {
-        const saved = localStorage.getItem('supreme_v3');
-        if(saved) state = JSON.parse(saved);
-    } catch(e) {}
+    let g = { xp: 0, lvl: 1, coins: 0, avatar: '👤', skin: '' };
+    try { const s = localStorage.getItem('sup_v4'); if(s) g = JSON.parse(s); } catch(e){}
 
-    let count, max, word, history = [];
+    let count, max, word, hLeft, history = [];
     const audio = new (window.AudioContext || window.webkitAudioContext)();
 
-    function sfx(f, t, d) {
+    function beep(f, d) {
         const o = audio.createOscillator(); const g = audio.createGain();
-        o.type = t; o.frequency.setValueAtTime(f, audio.currentTime);
-        g.gain.setValueAtTime(0.1, audio.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
+        o.frequency.value = f; g.gain.value = 0.1;
         o.connect(g); g.connect(audio.destination);
         o.start(); o.stop(audio.currentTime + d);
     }
 
     function save() {
-        localStorage.setItem('supreme_v3', JSON.stringify(state));
-        document.getElementById('m-lvl').innerText = state.lvl;
-        document.getElementById('m-coins').innerText = state.coins;
-        document.getElementById('m-streak').innerText = state.streak;
-        document.getElementById('m-avatar').innerText = state.avatar;
+        localStorage.setItem('sup_v4', JSON.stringify(g));
+        ['m-lvl', 'm-coins', 'm-avatar', 's-coins'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = g[id.split('-')[1]];
+        });
+        document.getElementById('main-body').className = g.skin;
     }
     save();
 
-    function nav(id) { 
-        sfx(400, 'sine', 0.1);
+    function toggle(id) { 
+        beep(400, 0.05);
         document.getElementById(id).classList.toggle('hidden'); 
     }
 
-    function startGame() {
-        word = document.getElementById('wordInput').value.trim().toUpperCase();
-        if(!word) return alert("ENTER A WORD!");
-        max = parseInt(document.getElementById('startQs').value);
+    function initGame() {
+        word = document.getElementById('wordIn').value.trim().toUpperCase();
+        if(!word) return alert("ENTER KEYWORD");
+        max = parseInt(document.getElementById('qIn').value);
         count = max;
-        document.getElementById('reveal-display').innerText = word.replace(/[A-Z]/g, "_ ");
-        document.getElementById('peek-word').innerText = word;
-        document.getElementById('finalWord').innerText = word;
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('dashboard-overlay').classList.add('hidden');
-        sfx(800, 'square', 0.2);
+        hLeft = parseInt(document.getElementById('hIn').value);
+        
+        document.getElementById('cat-text').innerText = document.getElementById('catIn').value || "NO CATEGORY";
+        document.getElementById('reveal-text').innerText = word.replace(/[A-Z0-9]/g, "_ ");
+        document.getElementById('peek-val').innerText = word;
+        document.getElementById('h-count').innerText = hLeft === 99 ? '∞' : hLeft;
+        
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('setup').classList.add('hidden');
+        beep(800, 0.1);
         update();
     }
 
-    function handle(ans, col) {
+    function act(ans, col) {
         if(count <= 0) return;
-        if(navigator.vibrate) navigator.vibrate(ans === 'NO' ? 80 : 30);
+        if(navigator.vibrate) navigator.vibrate(20);
         
-        history.push({count, ans: document.getElementById('last-answer').innerText, col: document.getElementById('last-answer').style.color});
+        history.push({count, ans: document.getElementById('last-ans').innerText, col: document.getElementById('last-ans').style.color});
         
-        let pen = document.getElementById('penalties').checked && (ans === 'MAYBE' || ans === 'DEP.') ? 2 : 1;
+        let pen = document.getElementById('penIn').checked && (ans === 'MAYBE' || ans === 'DEP.') ? 2 : 1;
         count = Math.max(0, count - pen);
         
-        if(ans === 'NO') {
-            sfx(100, 'sawtooth', 0.3);
-            document.getElementById('guesser-side').classList.add('shake');
-            setTimeout(()=>document.getElementById('guesser-side').classList.remove('shake'), 400);
-        } else sfx(600, 'sine', 0.1);
+        document.getElementById('last-ans').innerText = ans;
+        document.getElementById('last-ans').style.color = col;
+        
+        // Log Entry
+        const log = document.getElementById('game-log');
+        const item = document.createElement('div');
+        item.className = 'log-item';
+        item.style.background = col;
+        item.innerText = ans.charAt(0);
+        log.prepend(item);
 
-        document.getElementById('last-answer').innerText = ans;
-        document.getElementById('last-answer').style.color = col;
         update();
-        if(count === 0 && ans !== 'YES') setTimeout(()=>finish(false), 800);
+        if(count === 0 && ans !== 'YES') setTimeout(()=>over(0), 500);
     }
 
     function update() {
-        document.getElementById('q-count').innerText = count;
-        const offset = 314 - (314 * (count / max));
-        const bar = document.getElementById('prog-bar');
-        bar.style.strokeDashoffset = offset;
-        bar.style.stroke = count < 5 ? 'var(--danger)' : 'var(--accent)';
+        document.getElementById('q-val').innerText = count;
+        const off = 283 - (283 * (count / max));
+        document.getElementById('prog').style.strokeDashoffset = off;
     }
 
-    function undo() {
-        if(!history.length) return;
-        const last = history.pop();
-        count = last.count;
-        document.getElementById('last-answer').innerText = last.ans;
-        document.getElementById('last-answer').style.color = last.col;
-        update();
-    }
-
-    function giveHint() {
-        if(count < 5) return alert("INSUFFICIENT CHARGES (5 REQ)");
+    function sendHint() {
+        if(hLeft <= 0 || count < 5) return alert("CANNOT SEND HINT");
         const h = prompt("TRANSMIT HINT:");
         if(h) {
             count -= 5;
-            document.getElementById('hint-display').innerText = "HINT: " + h.toUpperCase();
-            sfx(1000, 'sine', 0.4);
+            if(hLeft !== 99) hLeft--;
+            document.getElementById('h-count').innerText = hLeft === 99 ? '∞' : hLeft;
+            document.getElementById('hint-msg').innerText = "HINT: " + h.toUpperCase();
+            beep(1000, 0.2);
             update();
         }
     }
 
-    function finish(won) {
-        const status = document.getElementById('winStatus');
-        const pay = document.getElementById('payout');
+    function over(won) {
+        const s = document.getElementById('r-status');
+        const p = document.getElementById('r-payout');
+        document.getElementById('r-word').innerText = word;
+        
         if(won) {
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#8b5cf6', '#fbbf24', '#22c55e'] });
-            state.coins += 50; state.xp += 100; state.streak++;
-            status.innerText = "VICTORY"; status.style.color = "var(--success)";
-            pay.innerText = "+50 COINS | +100 XP | STREAK: " + state.streak;
-            sfx(880, 'sine', 0.2);
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            g.coins += 100; g.xp += 150;
+            s.innerText = "SUCCESS"; s.style.color = "var(--success)";
+            p.innerText = "+100 COINS | +150 XP";
         } else {
-            state.streak = 0;
-            status.innerText = "DEFEAT"; status.style.color = "var(--danger)";
-            pay.innerText = "STREAK RESET";
-            sfx(100, 'sawtooth', 0.6);
+            s.innerText = "FAILED"; s.style.color = "var(--danger)";
+            p.innerText = "ENCRYPTION HELD";
         }
-        if(state.xp >= state.lvl * 200) { state.lvl++; state.xp = 0; }
+        
+        if(g.xp >= g.lvl * 300) { g.lvl++; g.xp = 0; }
         save();
-        document.getElementById('victory').classList.remove('hidden');
+        document.getElementById('result').classList.remove('hidden');
     }
 
     function buy(t, v, c) {
-        if(state.coins >= c) { state.coins -= c; state[t] = v; save(); sfx(1200, 'sine', 0.2); alert("UNLOCKED!"); }
-        else alert("INSUFFICIENT 💰");
+        if(g.coins >= c) { g.coins -= c; g[t] = v; save(); alert("UNLOCKED"); }
+        else alert("LACK OF FUNDS");
     }
 
-    function show(v) { document.getElementById('peek-word').style.opacity = v ? 1 : 0; }
+    function setSkin(s) { g.skin = s; save(); }
+    function peek(v) { document.getElementById('peek-val').style.opacity = v ? 1 : 0; }
+    function undo() {
+        if(!history.length) return;
+        const l = history.pop();
+        count = l.count;
+        document.getElementById('last-ans').innerText = l.ans;
+        document.getElementById('last-ans').style.color = l.col;
+        update();
+    }
 </script>
 </body>
 </html>
