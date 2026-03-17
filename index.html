@@ -3,183 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20? REFINED CLARITY</title>
+    <title>20? REALITY SHIFT</title>
     <style>
         :root {
-            --bg: #020617; --card: rgba(15, 23, 42, 0.98);
+            --bg: #020617; --card: #0f172a; --btn-r: 18px;
             --accent: #c084fc; --success: #22c55e; --danger: #ef4444;
-            --warning: #f59e0b; --info: #3b82f6; --text: #ffffff;
+            --text: #ffffff; --font: 'Inter', sans-serif;
             --grad: linear-gradient(180deg, #0f172a 0%, #020617 100%);
         }
 
-        .theme-sunset { --bg: #450a0a; --accent: #fbbf24; --grad: linear-gradient(180deg, #7c2d12 0%, #450a0a 100%); }
-        .theme-void { --bg: #000; --accent: #fff; --grad: linear-gradient(180deg, #111 0%, #000 100%); }
+        /* RADICAL THEME DIFFERENCES */
+        .theme-sunset { 
+            --bg: #450a0a; --card: #7c2d12; --accent: #fbbf24; --btn-r: 40px;
+            --grad: radial-gradient(circle at center, #92400e, #450a0a);
+        }
+        .theme-matrix { 
+            --bg: #000000; --card: #050505; --accent: #00ff41; --btn-r: 0px;
+            --grad: repeating-linear-gradient(0deg, #000 0px, #050505 2px);
+            --font: 'Courier New', monospace;
+        }
+        .theme-ghost { 
+            --bg: #f8fafc; --card: #ffffff; --accent: #334155; --text: #0f172a; --btn-r: 12px;
+            --grad: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+        }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
-        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: var(--font); transition: all 0.4s ease; } 
+        body, html { margin: 0; padding: 0; height: 100dvh; background: var(--bg); color: var(--text); overflow: hidden; }
 
-        .game-container { display: flex; flex-direction: column; height: 100dvh; background: var(--grad); transition: 0.8s; }
+        .game-container { display: flex; flex-direction: column; height: 100dvh; background: var(--grad); }
         .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        #guesser-side { transform: rotate(180deg); border-bottom: 0.5px solid rgba(255,255,255,0.2); backdrop-filter: blur(25px); }
-
-        /* TYPOGRAPHY */
-        h1 { font-weight: 100; font-size: 6rem; letter-spacing: -10px; margin: 0; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
-        .stats-label { font-size: 0.7rem; letter-spacing: 3px; font-weight: 300; opacity: 0.7; text-transform: uppercase; }
-        #last-ans { font-size: 4.5rem; font-weight: 100; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-
-        /* BUTTONS */
-        .btn { border: none; border-radius: 12px; font-weight: 400; color: white; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
-        .btn:active { transform: scale(0.96); opacity: 0.8; }
-        .yes { background: var(--success); } .no { background: var(--danger); }
-        .util { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.2); color: var(--text); }
-        .host-prime { border: 1px solid var(--accent); color: var(--accent); padding: 15px 50px; border-radius: 50px; font-size: 1.1rem; text-decoration: none; display: inline-block; text-align: center; }
-
-        /* CUSTOM SHOP ICON */
-        .shop-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; vertical-align: middle; }
-
-        /* OVERLAYS */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; transition: 0.5s; }
-        .hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
-        .card { width: 100%; max-width: 380px; padding: 35px; border-radius: 25px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 20px; text-align: center; }
-
-        input { background: rgba(255,255,255,0.05); border: none; border-bottom: 1px solid var(--accent); color: #fff; padding: 15px; font-size: 1.3rem; text-align: center; font-weight: 200; border-radius: 10px 10px 0 0; width: 100%; }
         
-        .ring-svg { width: 85px; height: 85px; transform: rotate(-90deg); filter: drop-shadow(0 0 5px var(--accent)); }
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 3; }
-        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 251; stroke-dashoffset: 0; transition: 1s ease-out; }
+        h1 { font-weight: 100; font-size: 6rem; letter-spacing: -10px; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .stats-label { font-size: 0.7rem; letter-spacing: 3px; font-weight: 600; opacity: 0.9; text-transform: uppercase; }
+        #last-ans { font-size: 4.5rem; font-weight: 100; letter-spacing: 5px; text-transform: uppercase; }
+
+        /* BUTTON FIX: High Contrast */
+        .btn { border: none; border-radius: var(--btn-r); font-weight: 700; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); }
+        .btn:active { transform: scale(0.92); }
+        .yes { background: var(--success); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); } 
+        .no { background: var(--danger); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+        .util { background: var(--card); color: var(--text); }
+        .host-prime { background: var(--accent); color: var(--bg); padding: 20px 60px; border-radius: 50px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* OVERLAYS: Solid Backgrounds */
+        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; padding: 25px; visibility: visible; opacity: 1; }
+        .hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(20px); }
+        
+        .card { width: 100%; max-width: 480px; margin: auto; background: var(--card); border-radius: var(--btn-r); padding: 35px; display: flex; flex-direction: column; gap: 20px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+
+        /* SHOP TABS */
+        .tabs { display: flex; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .tab { flex: 1; padding: 15px; font-size: 0.7rem; font-weight: 800; text-align: center; cursor: pointer; opacity: 0.5; }
+        .tab.active { opacity: 1; color: var(--accent); border-bottom: 3px solid var(--accent); }
+
+        /* THICK RING */
+        .ring-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+        .ring-fill { fill: none; stroke: var(--accent); stroke-width: 14; stroke-dasharray: 314; stroke-dashoffset: 0; stroke-linecap: round; }
+        
+        input, select { background: rgba(0,0,0,0.2); border: 2px solid var(--accent); color: var(--text); padding: 15px; border-radius: 10px; font-size: 1rem; width: 100%; }
     </style>
 </head>
-<body>
+<body id="b">
 
 <div id="m-menu" class="overlay">
-    <div id="p-title" class="stats-label" style="color:var(--accent)">BOUTIQUE EDITION</div>
-    <h1>20?</h1>
-    <div style="margin: 25px 0; font-weight: 200; letter-spacing: 2px;">
-        <span id="p-av">👤</span> <span style="opacity:0.4; margin:0 10px;">|</span> 💰 <span id="p-co">0</span>
-    </div>
-    <button class="btn host-prime" onclick="view('d-dash')">HOST SESSION</button>
-    
-    <div style="margin-top: 40px; display: flex; gap: 30px; align-items: center;">
-        <div onclick="view('sh-shop')" style="cursor:pointer; display: flex; align-items: center; gap: 8px;" class="stats-label">
-            <svg class="shop-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
-            Boutique
+    <div style="text-align: center; margin-top: auto;">
+        <div class="stats-label" style="color:var(--accent)">ULTRA CUSTOM</div>
+        <h1>20?</h1>
+        <div style="margin: 25px 0; font-size: 1.2rem; letter-spacing: 4px;">
+            <span id="p-av">👤</span> | 💰 <span id="p-co">0</span>
         </div>
-        <div onclick="view('o-settings')" style="cursor:pointer; font-size: 1.5rem;">⚙️</div>
-        <div onclick="cycleTheme()" style="cursor:pointer" class="stats-label">Visuals</div>
+        <button class="btn host-prime" style="margin: 0 auto;" onclick="view('d-host')">NEW SESSION</button>
+    </div>
+    <div style="margin-top: auto; display: flex; justify-content: space-around; padding-bottom: 40px;">
+        <div onclick="view('sh-shop')" style="cursor:pointer; text-align: center;">
+            <div class="stats-label">Shop</div>
+        </div>
+        <div onclick="view('o-opts')" style="cursor:pointer; text-align: center;">
+            <div class="stats-label">Visuals</div>
+        </div>
     </div>
 </div>
 
-<div id="o-settings" class="overlay hidden">
+<div id="o-opts" class="overlay hidden">
     <div class="card">
-        <div class="stats-label">Settings</div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="stats-label">Vibration</span>
-            <input type="checkbox" id="s-vib" checked style="width:20px; height:20px;">
-        </div>
-        <button class="btn host-prime" onclick="view('m-menu')">Apply</button>
+        <div class="stats-label">Atmosphere</div>
+        <select id="s-th" onchange="applyTheme(this.value)">
+            <option value="cyber">Cyber (Neon)</option>
+            <option value="sunset">Sunset (Warm)</option>
+            <option value="matrix">Matrix (Digital)</option>
+            <option value="ghost">Ghost (Light)</option>
+        </select>
+        <button class="btn host-prime" onclick="view('m-menu')">APPLY CHANGE</button>
     </div>
 </div>
 
 <div id="sh-shop" class="overlay hidden">
     <div class="card">
         <div class="stats-label">Boutique — 💰 <span id="sh-co">0</span></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-height: 40vh; overflow-y: auto;">
-            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('av', '🥷', 50)"><b>🥷</b> 50</div>
-            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('th', 'sunset', 100)"><b>🌅</b> 100</div>
-            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('ti', 'THE SEER', 150)"><b>SEER</b> 150</div>
-            <div style="padding:15px; border:1px solid #333; border-radius:15px;" onclick="buy('av', '💎', 1000)"><b>💎</b> 1000</div>
+        <div class="tabs">
+            <div class="tab active" onclick="setTab('av')">ITEMS</div>
+            <div class="tab" onclick="setTab('ti')">TITLES</div>
         </div>
-        <button class="btn util" style="padding:15px" onclick="view('m-menu')">Back</button>
+        <div id="shop-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; max-height:30vh; overflow-y:auto;"></div>
+        <button class="btn util" style="padding:15px" onclick="view('m-menu')">BACK</button>
     </div>
 </div>
 
-<div id="d-dash" class="overlay hidden">
+<div id="d-host" class="overlay hidden">
     <div class="card">
-        <div class="stats-label">Secure Initialization</div>
+        <div class="stats-label">Round Setup</div>
         <input type="password" id="wIn" placeholder="SECRET WORD">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-            <span class="stats-label">Max Turns</span>
-            <input type="number" id="qIn" value="20" style="width:60px; border:none; border-bottom:1px solid #444; background:transparent; color:#fff;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="stats-label">Turns</span>
+            <input type="number" id="qIn" value="20" style="width:70px;">
         </div>
-        <button class="btn host-prime" onclick="launch()">Initialize</button>
-        <button class="btn util" style="border:none" onclick="view('m-menu')">Cancel</button>
+        <button class="btn host-prime" onclick="launch()">START</button>
+        <button class="btn util" onclick="view('m-menu')">CANCEL</button>
     </div>
 </div>
 
 <div class="game-container">
-    <div id="guesser-side" class="side">
-        <div style="position: relative;">
-            <svg class="ring-svg"><circle class="ring-bg" cx="42" cy="42" r="40"/><circle id="r-fill" class="ring-fill" cx="42" cy="42" r="40"/></svg>
-            <div style="position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:1.5rem; font-weight:100;" id="q-val">20</div>
-        </div>
-        <div style="margin-top: 40px; text-align: center;">
-            <div id="h-lab" class="stats-label" style="color:var(--accent); height:15px;"></div>
-            <div id="bl" style="letter-spacing: 10px; font-size: 1.2rem; margin-top:10px; opacity:0.5; font-weight:200;"></div>
-        </div>
-        <div id="last-ans">READY</div>
+    <div class="side" style="transform: rotate(180deg); border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <svg class="ring-svg"><circle cx="55" cy="55" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/><circle id="r-fill" class="ring-fill" cx="55" cy="55" r="50"/></svg>
+        <div id="q-val" style="position:absolute; font-size:2rem; font-weight:100;">20</div>
+        <div id="bl" style="margin-top:40px; letter-spacing:10px; font-size:1.5rem; opacity:0.6;"></div>
+        <div id="last-ans" style="margin-top:20px;">READY</div>
     </div>
-
-    <div id="host-side" class="side">
-        <div style="margin-bottom: 45px; cursor: pointer;" onmousedown="pk(1)" onmouseup="pk(0)" ontouchstart="pk(1)" ontouchend="pk(0)">
-            <span class="stats-label" style="border:1px solid rgba(255,255,255,0.2); padding:10px 25px; border-radius:30px;">Reveal: <span id="pk-w" style="opacity:0; color:var(--accent);">?</span></span>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 90%; max-width: 420px;">
-            <button class="btn yes" style="height:60px" onclick="hit('YES', 'var(--success)')">Yes</button>
-            <button class="btn no" style="height:60px" onclick="hit('NO', 'var(--danger)')">No</button>
-            <button class="btn util" style="height:60px; color:var(--warning)" onclick="hit('MAYBE', 'var(--warning)')">May</button>
-            <button class="btn util" style="height:60px; color:var(--info)" onclick="hit('DEP.', 'var(--info)')">Dep.</button>
-            <button class="btn host-prime" style="grid-column: span 3; height: 65px;" onclick="finish(1)">Correct Guess</button>
-            <button class="btn util" style="height:65px" onclick="addHint()">Hint</button>
+    <div class="side">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; width:90%; max-width:450px;">
+            <button class="btn yes" style="height:60px;" onclick="hit('YES', 'var(--success)')">YES</button>
+            <button class="btn no" style="height:60px;" onclick="hit('NO', 'var(--danger)')">NO</button>
+            <button class="btn util" style="height:60px; color:var(--warning)" onclick="hit('MAYBE', 'var(--warning)')">MAYBE</button>
+            <button class="btn util" style="height:60px; color:var(--info)" onclick="hit('DEPENDS', 'var(--info)')">DEPENDS</button>
+            <button class="btn util" style="height:60px; color:#a78bfa" onclick="hit('SOMETIMES', '#a78bfa')">SOMETIMES</button>
+            <button class="btn util" style="height:60px" onclick="alert('Hint logic here')">HINT</button>
+            <button class="btn host-prime" style="grid-column: span 3; height: 70px;" onclick="finish(1)">CORRECT GUESS</button>
         </div>
     </div>
 </div>
 
 <script>
-    const def = { xp: 0, lvl: 1, co: 0, th: 'cyber', av: '👤', ti: 'THE NOVICE', inv: ['👤', 'THE NOVICE', 'cyber'] };
-    let st = JSON.parse(localStorage.getItem('20q-clarity-v2')) || def;
-    let cur, tot, sec = "", hist = [];
-
-    function save() { 
-        localStorage.setItem('20q-clarity-v2', JSON.stringify(st)); 
-        document.getElementById('p-co').innerText = st.co;
-        document.getElementById('sh-co').innerText = st.co;
-        document.getElementById('p-av').innerText = st.av;
-    }
+    let state = JSON.parse(localStorage.getItem('20q-shift')) || { co: 100, av: '👤', th: 'cyber', ti: 'NOVICE' };
+    let cur, tot, sec = "";
 
     function view(id) { 
         document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden')); 
         if(id !== 'none') document.getElementById(id).classList.remove('hidden'); 
     }
 
-    function cycleTheme() {
-        const ths = ['cyber', 'sunset', 'void'];
-        st.th = ths[(ths.indexOf(st.th) + 1) % ths.length];
-        applyTheme(); save();
-    }
-
-    function applyTheme() { document.body.className = st.th === 'cyber' ? '' : 'theme-' + st.th; }
-
-    function buy(type, val, price) {
-        if(st.inv.includes(val)) { st[type] = val; save(); applyTheme(); return; }
-        if(st.co >= price) { st.co -= price; st.inv.push(val); st[type] = val; save(); applyTheme(); }
+    function applyTheme(t) { 
+        state.th = t;
+        document.body.className = 'theme-' + t;
+        save();
     }
 
     function launch() {
         sec = document.getElementById('wIn').value.trim().toUpperCase();
         if(!sec) return;
-        tot = parseInt(document.getElementById('qIn').value) || 20;
-        cur = tot;
-        document.getElementById('pk-w').innerText = sec;
+        tot = parseInt(document.getElementById('qIn').value) || 20; cur = tot;
         document.getElementById('bl').innerText = sec.replace(/[A-Z]/g, "_ ");
         view('none'); upd();
     }
 
     function hit(a, c) {
         if(cur <= 0) return;
-        if(document.getElementById('s-vib').checked && navigator.vibrate) navigator.vibrate(25);
-        hist.push({a: document.getElementById('last-ans').innerText, c: document.getElementById('last-ans').style.color, cur, h: document.getElementById('h-lab').innerText});
-        cur--;
-        upd(a, c);
+        cur--; upd(a, c);
         if(cur === 0 && a !== 'YES') finish(0);
     }
 
@@ -187,23 +175,21 @@
         document.getElementById('q-val').innerText = cur;
         const l = document.getElementById('last-ans');
         l.innerText = a; l.style.color = c;
-        document.getElementById('r-fill').style.strokeDashoffset = 251 - (251 * (cur / tot));
+        document.getElementById('r-fill').style.strokeDashoffset = 314 - (314 * (cur / tot));
     }
-
-    function addHint() {
-        if(cur < 5) return;
-        let h = prompt("Secure Hint:");
-        if(h) { cur -= 5; document.getElementById('h-lab').innerText = "HINT: " + h.toUpperCase(); upd("HINT", "var(--accent)"); }
-    }
-
-    function pk(v) { document.getElementById('pk-w').style.opacity = v ? 1 : 0; }
 
     function finish(w) {
-        if(w) { st.co += 35; alert("SUCCESS: +35 CREDITS"); }
+        if(w) state.co += 50;
         save(); location.reload();
     }
 
-    applyTheme(); save();
+    function save() { 
+        localStorage.setItem('20q-shift', JSON.stringify(state)); 
+        document.getElementById('p-co').innerText = state.co;
+        document.getElementById('sh-co').innerText = state.co;
+    }
+
+    applyTheme(state.th); save();
 </script>
 </body>
 </html>
