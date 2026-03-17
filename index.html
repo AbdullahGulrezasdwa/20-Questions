@@ -3,171 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>20 Questions: Ultra Edition</title>
+    <title>20? SUPREME ENGINE v2.1</title>
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --accent: #8b5cf6;
-            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
-            --info: #3b82f6; --text: #f8fafc;
+            --bg: #020617; --glass: rgba(255, 255, 255, 0.05);
+            --accent: #8b5cf6; --success: #22c55e; --danger: #ef4444;
+            --text: #f8fafc; --font: 'Inter', sans-serif;
         }
 
+        /* Fix for mobile address bars */
         body, html { 
-            margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; 
-            overflow: hidden; background: var(--bg); color: var(--text);
+            margin: 0; padding: 0; height: 100%; height: 100dvh; font-family: var(--font);
+            background: var(--bg); color: var(--text); overflow: hidden;
             user-select: none; -webkit-user-select: none;
         }
 
-        .game-container { display: flex; flex-direction: column; height: 100vh; }
-        .side { flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-
-        #guesser-side { background: #1e1b4b; transform: rotate(180deg); border-bottom: 2px solid rgba(255,255,255,0.1); }
-        #hint-display { font-size: 1.2rem; color: var(--warning); font-weight: bold; margin-top: 10px; min-height: 1.5rem; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
-
-        #host-side { background: #0f172a; }
-
-        #peek-area { 
-            background: var(--card); padding: 12px 24px; border-radius: 50px;
-            margin-bottom: 15px; border: 1px solid var(--accent); 
-            cursor: pointer; touch-action: none; font-size: 0.9rem;
+        .game-container { display: flex; flex-direction: column; height: 100dvh; }
+        .side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        
+        #guesser-side { 
+            background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
+            transform: rotate(180deg); border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        #secret-word-display { opacity: 0; color: var(--warning); font-weight: 800; margin-left: 10px; transition: opacity 0.1s; }
-        
-        .badge { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin: 5px; border: 1px solid rgba(255,255,255,0.1); }
-        #last-answer { font-size: 4.5rem; font-weight: 900; margin: 5px; text-shadow: 0 0 20px rgba(255,255,255,0.1); text-align: center; }
 
-        .controls { width: 95%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .ans-btn { padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.1s; }
-        .ans-btn:active { transform: scale(0.95); }
+        .dashboard {
+            background: #0f172a; width: 85%; max-width: 380px; padding: 25px;
+            border-radius: 24px; border: 1px solid var(--accent);
+            display: flex; flex-direction: column; gap: 12px;
+            max-height: 80vh; overflow-y: auto;
+        }
         
-        .yes { background: var(--success); } .no { background: var(--danger); } 
-        .maybe { background: var(--warning); } .depends { background: var(--info); }
-        .win-btn { grid-column: span 2; background: var(--accent); font-size: 1.1rem; }
-        .util-btn { grid-column: span 1; background: #334155; font-size: 0.8rem; }
+        .ring-container { position: relative; width: 85px; height: 85px; }
+        .ring-container svg { transform: rotate(-90deg); width: 85px; height: 85px; }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 7; }
+        .ring-bar { fill: none; stroke: var(--accent); stroke-width: 7; stroke-dasharray: 245; stroke-dashoffset: 0; transition: 0.4s ease-out; stroke-linecap: round; }
 
-        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        input { background: var(--card); border: 2px solid var(--accent); color: white; padding: 18px; width: 260px; border-radius: 16px; font-size: 1.2rem; margin: 10px; text-align: center; outline: none; }
-        .primary-btn { background: var(--accent); color: white; padding: 16px 50px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+        .btn { padding: 12px; border: none; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; touch-action: manipulation; font-family: inherit; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .yes { background: var(--success); } .no { background: var(--danger); } .util { background: #334155; }
+        .host-btn { background: var(--accent); font-size: 1.2rem; padding: 18px 40px; border-radius: 50px; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .hidden { display: none !important; }
+        
+        input, select { background: var(--glass); border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; /* Prevents iOS zoom on focus */ }
+        
+        #last-answer { font-size: 4rem; font-weight: 900; margin: 5px 0; }
+        #clue-box { height: 3rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .hint-text { font-size: 0.8rem; color: var(--accent); font-weight: bold; }
+        .reveal-text { font-size: 1.1rem; color: var(--text); letter-spacing: 2px; }
+
+        @keyframes shake { 0%, 100% { transform: rotate(180deg) translateX(0); } 20% { transform: rotate(180deg) translateX(-6px); } 80% { transform: rotate(180deg) translateX(6px); } }
+        .shake-anim { animation: shake 0.25s ease-in-out; }
     </style>
 </head>
 <body>
 
-<div id="setup" class="overlay">
-    <h1 style="color:var(--accent); font-size: 4rem; margin:0; letter-spacing: -2px;">20?</h1>
-    <p style="opacity:0.6; margin-top:-5px;">TABLETOP EDITION</p>
-    <input type="password" id="wordInput" placeholder="Enter Secret Word" autocomplete="off">
-    <button class="primary-btn" onclick="startGame()">LOCK & START</button>
+<div id="main-menu" class="overlay">
+    <h1 style="color:var(--accent); font-size: 4rem; margin: 0; letter-spacing: -4px;">20?</h1>
+    <div style="margin: 15px 0; background: var(--glass); padding: 8px 16px; border-radius: 50px; font-size: 0.85rem;">
+        <span id="menu-avatar">👤</span> LVL <span id="menu-lvl">1</span> | 💰 <span id="menu-coins">0</span>
+    </div>
+    <button class="host-btn btn" onclick="toggle('dashboard-overlay')">HOST GAME</button>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button class="btn util" onclick="toggle('shop-overlay')">🛒 SHOP</button>
+        <button class="btn util" onclick="alert('Rules: Host sets the word. Guesser gets 20 tries. Good luck!')">?</button>
+    </div>
+</div>
+
+<div id="dashboard-overlay" class="overlay hidden">
+    <div class="dashboard">
+        <h2 style="margin:0; text-align:center; color: var(--accent);">HOST SETUP</h2>
+        <input type="password" id="wordInput" placeholder="SECRET WORD">
+        <select id="startQs">
+            <option value="20">20 Questions</option>
+            <option value="15">15 Questions</option>
+            <option value="10">10 Questions</option>
+        </select>
+        <div style="display:flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.8;">
+            <span>DOUBLE PENALTY (MAY/DEP)</span>
+            <input type="checkbox" id="checkPenalties" style="width:20px">
+        </div>
+        <button class="btn yes" style="padding:15px;" onclick="startGame()">START GAME</button>
+        <button class="btn util" onclick="toggle('dashboard-overlay')">BACK</button>
+    </div>
+</div>
+
+<div id="shop-overlay" class="overlay hidden">
+    <h2>SHOP</h2>
+    <p>Coins: <span id="shop-coins">0</span></p>
+    <button class="btn util" style="width:200px; margin:5px;" onclick="buy('avatar', '🤖', 50)">Robot (50c)</button>
+    <button class="btn util" style="width:200px; margin:5px;" onclick="buy('avatar', '👑', 100)">Crown (100c)</button>
+    <button class="btn no" onclick="toggle('shop-overlay')">EXIT</button>
 </div>
 
 <div id="victory" class="overlay hidden">
-    <h2 id="winStatus" style="color: var(--success); letter-spacing: 2px;">VICTORY</h2>
-    <h1 id="finalWordDisplay" style="font-size: 5rem; color: var(--warning); margin: 10px 0;">---</h1>
-    <button class="primary-btn" onclick="location.reload()">PLAY AGAIN</button>
+    <h2 id="winStatus">RESULT</h2>
+    <h1 id="finalWordDisplay" style="font-size: 4rem; color: var(--warning);">---</h1>
+    <button class="btn yes" style="width:200px" onclick="location.reload()">PLAY AGAIN</button>
 </div>
 
 <div class="game-container">
     <div id="guesser-side" class="side">
-        <div class="badge">CHANCES LEFT: <span class="q-val">20</span></div>
-        <div id="last-answer">READY?</div>
-        <div id="hint-display"></div>
+        <div class="ring-container">
+            <svg><circle class="ring-bg" cx="42" cy="42" r="39"/><circle id="prog-bar" class="ring-bar" cx="42" cy="42" r="39"/></svg>
+            <div style="position:absolute; top:32px; left:0; width:85px; text-align:center; font-weight:bold; font-size:1.2rem;"><span class="q-val">20</span></div>
+        </div>
+        <div id="clue-box">
+            <div id="hint-text" class="hint-text"></div>
+            <div id="reveal-text" class="reveal-text"></div>
+        </div>
+        <div id="last-answer">READY</div>
     </div>
 
     <div id="host-side" class="side">
-        <div id="peek-area" 
-             onmousedown="showWord(true)" onmouseup="showWord(false)" 
-             ontouchstart="showWord(true)" ontouchend="showWord(false)">
-            HOLD TO PEEK: <span id="secret-word-display">---</span>
+        <div id="peek-area" style="border: 1px solid var(--accent); padding: 12px 25px; border-radius: 50px; margin-bottom: 15px;" 
+             onmousedown="show(true)" onmouseup="show(false)" ontouchstart="show(true)" ontouchend="show(false)">
+            PEEK: <span id="secret-word-display" style="opacity:0; color:var(--warning); font-weight:bold;">---</span>
         </div>
-        
-        <div class="controls">
-            <button class="ans-btn yes" onclick="handleAns('YES', '#22c55e')">YES</button>
-            <button class="ans-btn no" onclick="handleAns('NO', '#ef4444')">NO</button>
-            <button class="ans-btn maybe" onclick="handleAns('MAYBE', '#f59e0b')">MAYBE</button>
-            <button class="ans-btn depends" onclick="handleAns('DEPENDS', '#3b82f6')">DEPENDS</button>
-            
-            <button class="ans-btn win-btn" onclick="endGame(true)">🏆 YOU GOT IT!</button>
-            <button class="ans-btn util-btn" onclick="giveHint()" style="color: var(--warning)">HINT (-5)</button>
-            
-            <button class="ans-btn util-btn" style="grid-column: span 1.5;" onclick="undo()">UNDO</button>
-            <button class="ans-btn util-btn" style="grid-column: span 1.5;" onclick="location.reload()">RESET</button>
+        <div class="controls" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 92%;">
+            <button class="btn yes" onclick="handle('YES', '#22c55e')">YES</button>
+            <button class="btn no" onclick="handle('NO', '#ef4444')">NO</button>
+            <button class="btn util" onclick="handle('MAYBE', '#f59e0b')">MAY</button>
+            <button class="btn util" onclick="handle('DEP.', '#3b82f6')">DEP.</button>
+            <button class="btn yes" style="grid-column: span 3; height: 50px;" onclick="end(true)">🏆 GUESSED IT</button>
+            <button class="btn util" onclick="giveHint()">HINT</button>
+            <button class="btn util" style="grid-column: span 2;" onclick="undo()">UNDO</button>
+            <button class="btn util" style="grid-column: span 2;" onclick="location.reload()">QUIT</button>
         </div>
-        <div class="badge" style="margin-top:20px">REMAINING: <span class="q-val">20</span></div>
     </div>
 </div>
 
 <script>
-    let count = 20;
-    let history = [];
-    let secret = "";
+    let data = JSON.parse(localStorage.getItem('gameData')) || { xp: 0, lvl: 1, coins: 0, avatar: '👤' };
+    let count, maxQ, secret = "", history = [];
+
+    function save() { localStorage.setItem('gameData', JSON.stringify(data)); updateMenu(); }
+    function updateMenu() {
+        document.getElementById('menu-lvl').innerText = data.lvl;
+        document.getElementById('menu-coins').innerText = data.coins;
+        document.getElementById('shop-coins').innerText = data.coins;
+        document.getElementById('menu-avatar').innerText = data.avatar;
+    }
+    updateMenu();
+
+    function toggle(id) { document.getElementById(id).classList.toggle('hidden'); }
+    function buy(type, val, cost) {
+        if(data.coins >= cost) { data.coins -= cost; data[type] = val; save(); alert("Unlocked!"); } 
+        else alert("Not enough coins!");
+    }
 
     function startGame() {
-        const input = document.getElementById('wordInput');
-        const word = input.value.trim().toUpperCase();
-        if (!word) return alert("Please type a secret word first!");
-        secret = word;
+        secret = document.getElementById('wordInput').value.trim().toUpperCase();
+        if(!secret) return alert("Enter a word!");
+        maxQ = parseInt(document.getElementById('startQs').value);
+        count = maxQ;
+        document.getElementById('reveal-text').innerText = secret.replace(/[A-Z]/g, "_ ");
         document.getElementById('secret-word-display').innerText = secret;
         document.getElementById('finalWordDisplay').innerText = secret;
-        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('dashboard-overlay').classList.add('hidden');
+        updateUI("READY", "white");
     }
 
-    function showWord(visible) {
-        document.getElementById('secret-word-display').style.opacity = visible ? "1" : "0";
-    }
-
-    function handleAns(ans, color) {
-        if (count <= 0) return;
-        saveHistory();
-        count--;
-        updateUI(ans, color);
-        if (count <= 0) endGame(false);
-    }
-
-    function giveHint() {
-        if (count < 5) return alert("Not enough questions left! A hint costs 5 questions.");
-        const hint = prompt("Type a one-word hint (Costs 5 Questions):");
-        if (hint) {
-            saveHistory();
-            count -= 5;
-            document.getElementById('hint-display').innerText = "HINT: " + hint.toUpperCase();
-            updateUI("HINT GIVEN", "var(--warning)");
-            if (count <= 0 && document.getElementById('victory').classList.contains('hidden')) endGame(false);
+    function handle(ans, col) {
+        if(count <= 0) return;
+        saveState();
+        let cost = (document.getElementById('checkPenalties').checked && (ans === 'MAYBE' || ans === 'DEP.')) ? 2 : 1;
+        count = Math.max(0, count - cost);
+        if(ans === 'NO') {
+            document.getElementById('guesser-side').classList.add('shake-anim');
+            setTimeout(() => document.getElementById('guesser-side').classList.remove('shake-anim'), 300);
         }
+        updateUI(ans, col);
+        if(count === 0 && ans !== 'YES') end(false);
     }
 
-    function saveHistory() {
+    function saveState() {
         history.push({
             ans: document.getElementById('last-answer').innerText,
-            color: document.getElementById('last-answer').style.color,
+            col: document.getElementById('last-answer').style.color,
             count: count,
-            hint: document.getElementById('hint-display').innerText
+            hint: document.getElementById('hint-text').innerText,
+            reveal: document.getElementById('reveal-text').innerText
         });
     }
 
+    function updateUI(ans, col) {
+        document.querySelectorAll('.q-val').forEach(e => e.innerText = count);
+        const disp = document.getElementById('last-answer');
+        disp.innerText = ans; disp.style.color = col;
+        const offset = 245 - (245 * (count / maxQ));
+        document.getElementById('prog-bar').style.strokeDashoffset = offset;
+    }
+
     function undo() {
-        if (history.length === 0) return;
+        if(history.length === 0) return;
         const last = history.pop();
         count = last.count;
-        document.getElementById('hint-display').innerText = last.hint;
-        updateUI(last.ans, last.color);
+        document.getElementById('hint-text').innerText = last.hint;
+        document.getElementById('reveal-text').innerText = last.reveal;
+        updateUI(last.ans, last.col);
     }
 
-    function updateUI(ans, color) {
-        document.querySelectorAll('.q-val').forEach(e => e.innerText = Math.max(0, count));
-        const disp = document.getElementById('last-answer');
-        disp.innerText = ans;
-        disp.style.color = color;
+    function giveHint() {
+        if(count < 5) return alert("Need 5 Qs!");
+        const h = prompt("Hint:");
+        if(h) {
+            saveState();
+            count -= 5;
+            document.getElementById('hint-text').innerText = "HINT: " + h.toUpperCase();
+            updateUI("HINT", "#8b5cf6");
+        }
     }
 
-    function endGame(won) {
-        if (!won) {
-            document.getElementById('winStatus').innerText = "GAME OVER";
-            document.getElementById('winStatus').style.color = "var(--danger)";
-        } else {
+    function end(won) {
+        if(won) {
+            data.coins += 20; data.xp += 50;
+            if(data.xp >= data.lvl * 100) { data.lvl++; data.xp = 0; }
+            save();
             document.getElementById('winStatus').innerText = "VICTORY";
             document.getElementById('winStatus').style.color = "var(--success)";
+        } else {
+            document.getElementById('winStatus').innerText = "DEFEAT";
+            document.getElementById('winStatus').style.color = "var(--danger)";
         }
         document.getElementById('victory').classList.remove('hidden');
     }
+
+    function show(v) { document.getElementById('secret-word-display').style.opacity = v ? 1 : 0; }
 </script>
 </body>
 </html>
