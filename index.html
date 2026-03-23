@@ -2,425 +2,397 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>S.T.A.R.K. V2 // ADAPTIVE INTEL</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=Space+Mono&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>S.T.A.R.K. // MARK XII</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-:root{
-  --accent:#00f2ff;
-  --bg:#020611;
-  --surf:#071a2d;
-  --gold:#ffcc00;
-  --green:#2dd4a0;
-  --red:#ff3e3e;
+:root {
+  --accent: #00e5ff; --bg: #01060e; --surf: rgba(3, 16, 30, 0.65);
+  --gold: #ffb700; --green: #00fa9a; --red: #ff2a2a;
+  --border: rgba(0, 229, 255, 0.3);
+  --glow: 0 0 20px rgba(0, 229, 255, 0.4);
 }
 
-body{
-  margin:0;
-  font-family:'Outfit',sans-serif;
-  background:var(--bg);
-  color:white;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { 
+  font-family: 'Outfit', sans-serif; background: var(--bg); color: white;
+  height: 100vh; overflow: hidden; display: flex; flex-direction: column;
 }
 
-/* HUD */
-.hud{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  font-family:'Space Mono';
-  border-bottom:1px solid rgba(255,255,255,0.1);
+/* ━━━━━━━━ CRT & HOLO EFFECTS ━━━━━━━━ */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 998;
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
 }
 
-/* Screen */
-.screen{
-  display:none;
-  flex:1;
-  padding:20px;
+/* ━━━━━━━━ BOOT SEQUENCE ━━━━━━━━ */
+#boot-screen {
+  position: fixed; inset: 0; background: #000; z-index: 10000;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  font-family: 'Space Mono'; color: var(--accent);
 }
-.active{display:flex;flex-direction:column;}
+.glitch-text { animation: glitch 0.2s linear infinite; }
+@keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
 
-.card{
-  flex:1;
-  background:var(--surf);
-  padding:25px;
-  border-radius:10px;
-  display:flex;
-  flex-direction:column;
-}
-
-/* Buttons */
-button{
-  padding:14px;
-  margin:6px 0;
-  border:1px solid var(--accent);
-  background:transparent;
-  color:var(--accent);
-  cursor:pointer;
-}
-button:hover{
-  background:var(--accent);
-  color:black;
+/* ━━━━━━━━ HUD ━━━━━━━━ */
+.hud {
+  display: flex; justify-content: space-between; padding: 15px 20px;
+  font-family: 'Space Mono'; border-bottom: 1px solid var(--border);
+  background: rgba(1, 8, 15, 0.9); backdrop-filter: blur(10px); z-index: 100;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5); text-transform: uppercase; font-size: 0.7rem;
 }
 
-/* Answers */
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-.y{border-color:var(--green);color:var(--green);}
-.n{border-color:var(--red);color:var(--red);}
-.m{
-  grid-column:span 2;
-  border-color:var(--gold);
-  color:var(--gold);
+.screen { display: none; flex: 1; padding: 20px; flex-direction: column; max-width: 600px; margin: 0 auto; width: 100%; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.active { display: flex; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.card {
+  flex: 1; background: var(--surf); padding: 30px; border-radius: 8px;
+  border: 1px solid var(--border); backdrop-filter: blur(30px) saturate(120%);
+  display: flex; flex-direction: column; position: relative;
+  box-shadow: inset 0 0 50px rgba(0, 229, 255, 0.05), 0 10px 30px rgba(0,0,0,0.8);
 }
 
-/* Text */
-.big{
-  font-size:2rem;
-  text-align:center;
-  margin:30px 0;
+/* ━━━━━━━━ RINGS ━━━━━━━━ */
+.ring-box { position: relative; width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;}
+.ring-svg { transform: rotate(-90deg); filter: drop-shadow(var(--glow)); }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 3; }
+.ring-fill {
+  fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 440; stroke-dashoffset: 440;
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s;
 }
 
-/* Bars */
-.bar{
-  height:5px;
-  background:#222;
+/* ━━━━━━━━ INTERACTIVITY ━━━━━━━━ */
+button {
+  padding: 16px; margin: 6px 0; border: 1px solid var(--accent);
+  background: rgba(0, 229, 255, 0.05); color: var(--accent);
+  font-family: 'Space Mono'; font-weight: bold; cursor: pointer; transition: all 0.2s ease;
+  letter-spacing: 1px; text-transform: uppercase; position: relative; overflow: hidden;
 }
-.fill{
-  height:100%;
-  background:var(--gold);
-  width:0%;
-  transition:.3s;
-}
+button::before { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.2), transparent); transition: 0.5s; }
+button:hover::before { left: 100%; }
+button:hover { background: var(--accent); color: var(--bg); box-shadow: var(--glow); transform: translateY(-2px); }
+button:active { transform: scale(0.96); }
 
-.conf{
-  height:4px;
-  background:var(--green);
-  margin-top:6px;
-  width:0%;
-}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; }
+.y { border-color: var(--green); color: var(--green); } .y:hover { background: var(--green); color: black; box-shadow: 0 0 20px var(--green); }
+.n { border-color: var(--red); color: var(--red); } .n:hover { background: var(--red); color: white; box-shadow: 0 0 20px var(--red); }
+.m { grid-column: span 2; border-color: var(--gold); color: var(--gold); } .m:hover { background: var(--gold); color: black; box-shadow: 0 0 20px var(--gold); }
 
-/* Toast */
-#toast{
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:var(--accent);
-  color:black;
-  padding:6px 14px;
-  display:none;
-}
+input { padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--accent); font-family: 'Space Mono'; margin-bottom: 10px; width: 100%; outline: none; }
+input:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+
+.scramble-text { font-family: 'Space Mono'; font-weight: 700; letter-spacing: 2px; }
 </style>
 </head>
-
 <body>
 
-<div class="hud">
-  <div>LVL <span id="lvl">1</span></div>
-  <div id="status">ADAPTIVE CORE</div>
+<div id="boot-screen">
+  <div class="glitch-text" style="font-size: 2rem; font-weight: 800;">J.A.R.V.I.S.</div>
+  <div id="boot-log" style="margin-top: 20px; font-size: 0.7rem; opacity: 0.7; text-align: center;"></div>
 </div>
 
-<div id="toast"></div>
+<div class="hud">
+  <div style="color:var(--gold);">CLR_LEVEL: <span id="lvl-display">1</span></div>
+  <div id="status-text">SYSTEM_ONLINE</div>
+</div>
 
-<!-- MENU -->
-<div id="menu" class="screen active">
+<div id="menu" class="screen">
   <div class="card">
-    <h1>S.T.A.R.K.</h1>
-    <div class="bar"><div id="xpbar" class="fill"></div></div>
-    <button onclick="start()">START</button>
-    <button onclick="show('stats')">STATS</button>
+    <h1 style="font-size: 3.5rem; font-weight: 800; letter-spacing: -2px; line-height: 1;">STARK</h1>
+    <p style="font-size: 0.65rem; letter-spacing: 4px; color: var(--accent); margin-bottom: 30px;">NEURAL_PREDICTIVE_ENGINE</p>
+    
+    <div style="height:3px; background:rgba(255,255,255,0.1); margin-bottom: 25px; border-radius: 3px; overflow: hidden;">
+      <div id="xp-bar" style="height:100%; background:var(--gold); width:0%; transition:1s ease-out; box-shadow: 0 0 10px var(--gold);"></div>
+    </div>
+    
+    <button onclick="start()">Run Simulation (Solo)</button>
+    <button onclick="show('multi-setup')" style="border-style: dashed;">Neural Link (Multiplayer)</button>
+    <button onclick="show('stats')" style="opacity: 0.8; border-color: rgba(255,255,255,0.3); color: white;">Access Archives</button>
   </div>
 </div>
 
-<!-- GAME -->
+<div id="multi-setup" class="screen">
+  <div class="card">
+    <h2 style="color:var(--accent); margin-bottom: 10px;">NEURAL_LINK</h2>
+    <p style="font-size:0.7rem; margin-bottom:20px; opacity:0.8; font-family:'Space Mono';">Establish a P2P connection with another operative.</p>
+    
+    <button onclick="hostGame()">Generate Host Key</button>
+    <div id="id-display" style="font-family:'Space Mono'; color:var(--gold); margin: 15px 0; font-size: 0.9rem; text-align: center; font-weight: bold;"></div>
+    
+    <div style="text-align:center; font-family:'Space Mono'; font-size:0.6rem; opacity:0.5; margin: 15px 0;">— OR —</div>
+    
+    <input id="join-id" placeholder="Paste Remote Key Here...">
+    <button onclick="joinGame(document.getElementById('join-id').value)">Connect to Remote</button>
+    <button onclick="show('menu')" style="border:none; font-size:0.7rem; margin-top: auto;">Abort</button>
+  </div>
+</div>
+
 <div id="game" class="screen">
   <div class="card">
-    <div id="count">01/20</div>
-
-    <div id="q" class="big">...</div>
-
-    <div class="bar"><div id="confidence" class="conf"></div></div>
-
-    <div class="grid">
-      <button class="y" onclick="ans(1)">YES</button>
-      <button class="n" onclick="ans(0)">NO</button>
-      <button class="m" onclick="ans(0.5)">MAYBE</button>
+    <div style="display:flex; justify-content:space-between; font-family:'Space Mono'; font-size:0.65rem;">
+      <span style="color:var(--t3)">QUERY_LIMIT:</span>
+      <span id="count-display" style="color:var(--accent);">01/20</span>
+    </div>
+    
+    <div class="ring-box">
+      <svg width="180" height="180" class="ring-svg">
+        <circle class="ring-bg" cx="90" cy="90" r="80"></circle>
+        <circle id="conf-ring" class="ring-fill" cx="90" cy="90" r="80"></circle>
+      </svg>
+      <div id="q-text" style="position:absolute; text-align:center; padding:20px; font-size:1.3rem; font-weight:600; width: 100%;"></div>
     </div>
 
-    <button id="restart" onclick="location.reload()" style="display:none;">MENU</button>
+    <div id="candidates-left" style="text-align:center; font-family:'Space Mono'; font-size:0.6rem; color:var(--gold); margin-bottom: 15px; opacity: 0.8;"></div>
+
+    <div class="grid" id="controls">
+      <button class="y" onclick="ans(1)">Affirmative</button>
+      <button class="n" onclick="ans(0)">Negative</button>
+      <button class="m" onclick="ans(0.5)">Indeterminate</button>
+    </div>
+
+    <button id="restart-btn" onclick="location.reload()" style="display:none; margin-top:auto;">End Simulation</button>
   </div>
 </div>
 
-<!-- LEARN -->
-<div id="learn" class="screen">
-  <div class="card">
-    <h2>AI LEARNING MODE</h2>
-    <input id="newWord" placeholder="What was your object?">
-    <input id="newTag" placeholder="Give ONE keyword (e.g. furry, metal)">
-    <button onclick="saveNew()">SAVE</button>
-  </div>
-</div>
-
-<!-- STATS -->
 <div id="stats" class="screen">
   <div class="card">
-    <h2>DATA</h2>
-    <p>Wins: <span id="wins"></span></p>
-    <p>XP: <span id="xp"></span></p>
-    <button onclick="show('menu')">BACK</button>
+    <h2 style="color:var(--gold); margin-bottom: 20px;">ARCHIVED_DATA</h2>
+    <div style="font-family:'Space Mono'; font-size: 0.9rem; line-height: 2;">
+      <p>SimULATIONS_WON: <span id="wins-display" style="color:var(--green); float:right;">0</span></p>
+      <p>TOTAL_XP_YIELD: <span id="xp-display" style="color:var(--accent); float:right;">0</span></p>
+    </div>
+    <button onclick="show('menu')" style="margin-top:auto;">Return</button>
   </div>
 </div>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-
-/* ━━━━━━━━━━━ KNOWLEDGE BASE ━━━━━━━━━━━ */
-let KB = JSON.parse(localStorage.getItem('stark_kb')) || [
-  {w:"DOG",t:["alive","pet","furry"]},
-  {w:"CAR",t:["object","metal","fast"]},
-  {w:"PHONE",t:["object","electronic","small"]},
-  {w:"PIZZA",t:["food","edible","round"]}
-];
-
-let MEMORY = JSON.parse(localStorage.getItem('stark_memory')) || [];
-
-/* QUESTIONS */
-const QUESTIONS = [
-  {q:"Is it alive?",t:"alive"},
-  {q:"Is it an object?",t:"object"},
-  {q:"Is it edible?",t:"food"},
-  {q:"Does it use electricity?",t:"electronic"},
-  {q:"Is it furry?",t:"furry"},
-  {q:"Is it fast?",t:"fast"},
-  {q:"Is it small?",t:"small"},
-  {q:"Is it man-made?",t:"metal"}
-];
-
-/* STATE */
-let S = {
-  scores: [],
-  asked: [],
-  qNum: 1,
-  currentTag: "",
-  xp: +localStorage.stark_xp || 0,
-  wins: +localStorage.stark_wins || 0,
-  peer: null,
-  conn: null,
-  multiplayer: false
+/* ━━━━━━━━━━━ BOOT SEQUENCE ━━━━━━━━━━━ */
+window.onload = () => {
+  const logs = ["INITIALIZING NEURAL NET...", "LOADING KNOWLEDGE BASE...", "BYPASSING FIREWALLS...", "J.A.R.V.I.S. ONLINE."];
+  let logEl = document.getElementById('boot-log');
+  let i = 0;
+  let bootInterval = setInterval(() => {
+    if(i < logs.length) { logEl.innerText += logs[i] + "\n"; i++; } 
+    else { clearInterval(bootInterval); document.getElementById('boot-screen').style.display = 'none'; show('menu'); updateHUD(); }
+  }, 400);
 };
 
-/* ━━━━━━━━━━━ START ━━━━━━━━━━━ */
+/* ━━━━━━━━━━━ AI ENGINE (EXPANDED KB) ━━━━━━━━━━━ */
+let KB = JSON.parse(localStorage.getItem('stark_kb')) || [
+  {w:"DOG",t:["alive","pet","furry"]}, {w:"CAT",t:["alive","pet","furry","claws"]},
+  {w:"CAR",t:["object","metal","fast","transport"]}, {w:"BICYCLE",t:["object","metal","transport"]},
+  {w:"PHONE",t:["object","electronic","small"]}, {w:"LAPTOP",t:["object","electronic"]},
+  {w:"PIZZA",t:["food","edible","hot"]}, {w:"APPLE",t:["food","edible","nature"]}
+];
+
+const QUESTIONS = [
+  {q:"Is it a biological organism?", t:"alive"},
+  {q:"Is it an inanimate object?", t:"object"},
+  {q:"Is it meant for consumption?", t:"food"},
+  {q:"Does it require a power source?", t:"electronic"},
+  {q:"Does it have fur or hair?", t:"furry"},
+  {q:"Is it used for transportation?", t:"transport"},
+  {q:"Is it smaller than a microwave?", t:"small"},
+  {q:"Is it primarily made of metal?", t:"metal"}
+];
+
+let S = {
+  scores: [], asked: [], qNum: 1, currentTag: "",
+  xp: +localStorage.getItem('stark_xp') || 0,
+  wins: +localStorage.getItem('stark_wins') || 0,
+  peer: null, conn: null, multiplayer: false,
+  isTyping: false
+};
+
+/* ━━━━━━━━━━━ GAMEPLAY ━━━━━━━━━━━ */
 function start() {
-  S.scores = KB.map(() => 1);
-  S.asked = [];
-  S.qNum = 1;
-
-  document.getElementById('status').innerText = "SCANNING";
-  resetRing();
-
+  S.scores = KB.map(() => 1.0);
+  S.asked = []; S.qNum = 1;
   show("game");
+  document.getElementById('controls').style.display = "grid";
+  document.getElementById('restart-btn').style.display = "none";
   next();
 }
 
-/* ━━━━━━━━━━━ QUESTION SELECTION (INFO GAIN) ━━━━━━━━━━━ */
+function typeWriter(text, elementId, callback) {
+  if(S.isTyping) return;
+  S.isTyping = true;
+  let i = 0;
+  let el = document.getElementById(elementId);
+  el.innerHTML = "";
+  
+  function type() {
+    if (i < text.length) {
+      el.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(type, 25); // Typing speed
+    } else {
+      S.isTyping = false;
+      if(callback) callback();
+    }
+  }
+  type();
+}
+
 function next() {
-  if(S.qNum > 20) return reveal();
+  if(S.qNum > 20) return reveal(false);
 
-  let best = null;
-  let bestEntropy = -Infinity;
+  // AUTO-INTERCEPT: If highly confident, guess early
+  let sortedScores = [...S.scores].sort((a,b) => b-a);
+  let confidence = sortedScores[0] - (sortedScores[1] || 0);
+  if(confidence > 0.85 && S.qNum > 4) {
+    document.getElementById('status-text').innerText = "DATA_SUFFICIENT";
+    return reveal(true);
+  }
 
+  let best = null, maxEntropy = -Infinity;
   QUESTIONS.forEach(q => {
     if(S.asked.includes(q.t)) return;
-
-    let yes = 0, no = 0;
-
-    KB.forEach((obj,i)=>{
-      if(obj.t.includes(q.t)) yes += S.scores[i];
-      else no += S.scores[i];
-    });
-
-    let total = yes + no;
+    let yesWt = 0, noWt = 0;
+    KB.forEach((obj, i) => { obj.t.includes(q.t) ? yesWt += S.scores[i] : noWt += S.scores[i]; });
+    
+    let total = yesWt + noWt;
     if(total === 0) return;
-
-    let pYes = yes / total;
-    let pNo = no / total;
-
-    let entropy = -(pYes*Math.log2(pYes||1) + pNo*Math.log2(pNo||1));
-
-    if(entropy > bestEntropy){
-      bestEntropy = entropy;
-      best = q;
-    }
+    
+    let pY = yesWt/total, pN = noWt/total;
+    let entropy = -(pY * Math.log2(pY||1) + pN * Math.log2(pN||1));
+    
+    if(entropy > maxEntropy) { maxEntropy = entropy; best = q; }
   });
 
-  if(!best) return reveal();
+  if(!best || maxEntropy < 0.05) return reveal(false);
 
   S.currentTag = best.t;
+  document.getElementById('count-display').innerText = String(S.qNum).padStart(2,"0") + "/20";
+  
+  // Count remaining viable candidates
+  let remaining = S.scores.filter(s => s > 0.1).length;
+  document.getElementById('candidates-left').innerText = `POSSIBILITIES: ${remaining}`;
 
-  q_text.innerText = best.q;
-  count.innerText = String(S.qNum).padStart(2,"0") + "/20";
-
+  typeWriter(best.q, 'q-text');
   updateStatus();
 }
 
-/* ━━━━━━━━━━━ ANSWER HANDLER (WEIGHTED AI) ━━━━━━━━━━━ */
 function ans(v) {
+  if(S.isTyping) return; // Prevent answering while typing
   S.asked.push(S.currentTag);
-
-  KB.forEach((obj,i)=>{
+  
+  KB.forEach((obj, i) => {
     let has = obj.t.includes(S.currentTag);
-
-    if(v === 1){
-      S.scores[i] *= has ? 1.5 : 0.3;
-    }
-    else if(v === 0){
-      S.scores[i] *= has ? 0.3 : 1.5;
-    }
-    else{
-      S.scores[i] *= has ? 1.1 : 0.9;
-    }
+    if(v === 1) S.scores[i] *= has ? 2.0 : 0.1;
+    else if(v === 0) S.scores[i] *= has ? 0.1 : 2.0;
   });
 
-  normalizeScores();
+  let max = Math.max(...S.scores);
+  if(max > 0) S.scores = S.scores.map(s => s / max);
+
   updateConfidence();
-
-  if(S.multiplayer && S.conn){
-    S.conn.send({type:"answer", value:v});
-  }
-
+  if(S.multiplayer && S.conn) S.conn.send({type:"answer", value:v});
+  
   S.qNum++;
   next();
 }
 
-/* NORMALIZE */
-function normalizeScores(){
-  let max = Math.max(...S.scores);
-  if(max === 0) return;
-  S.scores = S.scores.map(s => s / max);
+function updateConfidence() {
+  let sorted = [...S.scores].sort((a,b) => b-a);
+  let conf = sorted[0] - (sorted[1] || 0);
+  let offset = 440 - (440 * conf);
+  let ring = document.getElementById('conf-ring');
+  ring.style.strokeDashoffset = Math.max(0, offset);
+  
+  if(conf > 0.7) ring.style.stroke = "var(--green)";
+  else if(conf > 0.4) ring.style.stroke = "var(--gold)";
+  else ring.style.stroke = "var(--accent)";
 }
 
-/* ━━━━━━━━━━━ CONFIDENCE SYSTEM ━━━━━━━━━━━ */
-function updateConfidence(){
-  let max = Math.max(...S.scores);
-  let second = [...S.scores].sort((a,b)=>b-a)[1] || 0;
-
-  let confidence = max - second;
-
-  conf_ring.style.strokeDashoffset = 440 - (440 * confidence);
+/* ━━━━━━━━━━━ CRYPTOGRAPHIC REVEAL ━━━━━━━━━━━ */
+function scrambleText(targetWord, elementId) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+  let el = document.getElementById(elementId);
+  let iterations = 0;
+  
+  let interval = setInterval(() => {
+    el.innerText = targetWord.split("").map((letter, index) => {
+      if(index < iterations) return letter;
+      return chars[Math.floor(Math.random() * chars.length)];
+    }).join("");
+    
+    if(iterations >= targetWord.length) clearInterval(interval);
+    iterations += 1/3; 
+  }, 30);
 }
 
-/* ━━━━━━━━━━━ REVEAL ━━━━━━━━━━━ */
-function reveal(){
-  let bestIndex = S.scores.indexOf(Math.max(...S.scores));
-  let guess = KB[bestIndex]?.w || "UNKNOWN";
-
-  q_text.innerHTML = `<span style="color:var(--accent)">TARGET LOCK:</span><br>${guess}`;
-
+function reveal(earlyIntercept) {
   document.getElementById('controls').style.display = "none";
-  document.getElementById('restart').style.display = "block";
+  let bestIdx = S.scores.indexOf(Math.max(...S.scores));
+  let guess = KB[bestIdx]?.w || "UNKNOWN_ENTITY";
+  
+  let prefix = earlyIntercept ? "<span style='color:var(--gold); font-size:0.7rem'>INTERCEPT_LOCK:</span><br>" : "<span style='color:var(--accent); font-size:0.7rem'>TARGET_LOCK:</span><br>";
+  
+  document.getElementById('q-text').innerHTML = prefix + `<span id="scramble-box" class="scramble-text" style="font-size:1.8rem;"></span>`;
+  
+  scrambleText(guess, 'scramble-box');
+  
+  document.getElementById('restart-btn').style.display = "block";
+  document.getElementById('candidates-left').innerText = "ANALYSIS COMPLETE";
 
-  if(Math.max(...S.scores) > 0.8){
-    awardWin();
-  } else {
-    MEMORY.push({failed:true, time:Date.now()});
-    localStorage.setItem('stark_memory', JSON.stringify(MEMORY));
-  }
-
-  document.getElementById('status').innerText = "LOCKED";
+  if(S.scores[bestIdx] > 0.6) awardWin();
 }
 
 /* ━━━━━━━━━━━ MULTIPLAYER ━━━━━━━━━━━ */
-function hostGame(){
+function hostGame() {
   S.peer = new Peer();
-  S.peer.on('open', id=>{
-    notify("HOST ID: " + id);
-  });
-
-  S.peer.on('connection', conn=>{
-    S.conn = conn;
-    S.multiplayer = true;
-
-    conn.on('data', data=>{
-      if(data.type==="answer"){
-        ans(data.value);
-      }
-    });
+  S.peer.on('open', id => { document.getElementById('id-display').innerText = id; });
+  S.peer.on('connection', conn => {
+    S.conn = conn; S.multiplayer = true;
+    document.getElementById('status-text').innerText = "LINK_ESTABLISHED";
+    start();
+    conn.on('data', data => { if(data.type === "answer") ans(data.value); });
   });
 }
 
-function joinGame(id){
+function joinGame(id) {
+  if(!id) return;
   S.peer = new Peer();
-
   S.conn = S.peer.connect(id);
-  S.multiplayer = true;
-
-  S.conn.on('open', ()=>{
-    notify("CONNECTED");
+  S.conn.on('open', () => {
+    S.multiplayer = true;
+    document.getElementById('status-text').innerText = "LINK_ESTABLISHED";
+    show('game');
   });
 }
 
-/* ━━━━━━━━━━━ SYSTEM ━━━━━━━━━━━ */
-function awardWin(){
-  S.xp += 50;
-  S.wins++;
-
-  localStorage.stark_xp = S.xp;
-  localStorage.stark_wins = S.wins;
-
+/* ━━━━━━━━━━━ UTILS ━━━━━━━━━━━ */
+function awardWin() {
+  S.xp += 100; S.wins++;
+  localStorage.setItem('stark_xp', S.xp); localStorage.setItem('stark_wins', S.wins);
   updateHUD();
-  notify("+50 XP");
 }
 
-function updateHUD(){
-  let lvl = Math.floor(S.xp/500)+1;
-
-  lvl_display.innerText = lvl;
-  xp_bar.style.width = (S.xp%500)/5 + "%";
-
-  wins_display.innerText = S.wins;
-  xp_display.innerText = S.xp;
+function updateHUD() {
+  document.getElementById('lvl-display').innerText = Math.floor(S.xp/1000)+1;
+  document.getElementById('xp-bar').style.width = (S.xp%1000)/10 + "%";
+  document.getElementById('wins-display').innerText = S.wins;
+  document.getElementById('xp-display').innerText = S.xp;
 }
 
-function updateStatus(){
-  if(S.qNum < 5) status.innerText = "SCANNING";
-  else if(S.qNum < 12) status.innerText = "NARROWING";
-  else status.innerText = "TARGETING";
+function updateStatus() {
+  const st = document.getElementById('status-text');
+  if(S.qNum < 7) st.innerText = "SCANNING_PARAMS";
+  else if(S.qNum < 14) st.innerText = "TRIANGULATING_DATA";
+  else st.innerText = "LOCKING_SIGNATURE";
 }
 
-function resetRing(){
-  conf_ring.style.strokeDashoffset = 440;
-}
-
-function notify(msg){
-  toast.innerText = "[SYS]: " + msg;
-  toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",2500);
-}
-
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-
-function clearMemory(){
-  if(confirm("WIPE ALL DATA?")){
-    localStorage.clear();
-    location.reload();
-  }
-}
-
-/* INIT */
-updateHUD();
-
 </script>
-
 </body>
 </html>
