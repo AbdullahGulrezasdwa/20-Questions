@@ -2,293 +2,425 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>S.T.A.R.K. // OMNI-INTEL</title>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700;800&family=Space+Mono&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.T.A.R.K. V2 // ADAPTIVE INTEL</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=Space+Mono&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --accent: #00f2ff; --bg: #01080f; --surf: #051625;
-  --gold: #ffcc00; --red: #ff3e3e; --green: #2dd4a0;
-  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+:root{
+  --accent:#00f2ff;
+  --bg:#020611;
+  --surf:#071a2d;
+  --gold:#ffcc00;
+  --green:#2dd4a0;
+  --red:#ff3e3e;
 }
 
-/* THEMES */
-body.theme-stark { --accent: #ff3e3e; --bg: #0f0101; --surf: #250505; }
-body.theme-stealth { --accent: #ffffff; --bg: #000000; --surf: #111111; }
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-  background: var(--bg); color: #e1f5fe; font-family: 'Outfit', sans-serif;
-  height: 100vh; overflow: hidden; position: relative; transition: 0.5s;
+body{
+  margin:0;
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
 }
 
-/* STARK HUD OVERLAY */
-body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1000;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px);
+/* HUD */
+.hud{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 15px;
+  font-family:'Space Mono';
+  border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-#app { max-width: 500px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 20px; z-index: 5; position: relative; }
+/* Screen */
+.screen{
+  display:none;
+  flex:1;
+  padding:20px;
+}
+.active{display:flex;flex-direction:column;}
 
-.hud-bar {
-  display: flex; justify-content: space-between; padding: 12px;
-  border: 1px solid rgba(0, 242, 255, 0.2); margin-bottom: 15px; background: rgba(5, 22, 37, 0.6);
+.card{
+  flex:1;
+  background:var(--surf);
+  padding:25px;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
 }
 
-.screen { display: none; flex-direction: column; flex: 1; animation: slideUp 0.4s var(--spring); }
-.active { display: flex; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.card {
-  background: var(--surf); border: 1px solid rgba(0, 242, 255, 0.1);
-  padding: 25px; border-radius: 4px; flex: 1; position: relative; overflow-y: auto;
+/* Buttons */
+button{
+  padding:14px;
+  margin:6px 0;
+  border:1px solid var(--accent);
+  background:transparent;
+  color:var(--accent);
+  cursor:pointer;
+}
+button:hover{
+  background:var(--accent);
+  color:black;
 }
 
-/* BUTTONS */
-button {
-  background: rgba(0, 242, 255, 0.05); border: 1px solid var(--accent);
-  color: var(--accent); padding: 14px; font-family: 'Space Mono';
-  font-weight: bold; text-transform: uppercase; cursor: pointer; margin: 5px 0;
+/* Answers */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
-button:hover { background: var(--accent); color: var(--bg); }
+.y{border-color:var(--green);color:var(--green);}
+.n{border-color:var(--red);color:var(--red);}
+.m{
+  grid-column:span 2;
+  border-color:var(--gold);
+  color:var(--gold);
+}
 
-/* LEADERBOARD UI */
-.lb-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
-.xp-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin: 10px 0; }
-#xp-fill { height: 100%; background: var(--gold); transition: 1s; }
+/* Text */
+.big{
+  font-size:2rem;
+  text-align:center;
+  margin:30px 0;
+}
 
-#toast {
-  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  background: var(--accent); color: var(--bg); padding: 8px 15px;
-  font-family: 'Space Mono'; font-size: 0.7rem; z-index: 9999; display: none;
+/* Bars */
+.bar{
+  height:5px;
+  background:#222;
+}
+.fill{
+  height:100%;
+  background:var(--gold);
+  width:0%;
+  transition:.3s;
+}
+
+.conf{
+  height:4px;
+  background:var(--green);
+  margin-top:6px;
+  width:0%;
+}
+
+/* Toast */
+#toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--accent);
+  color:black;
+  padding:6px 14px;
+  display:none;
 }
 </style>
 </head>
-<body class="theme-default">
 
-<div id="toast">SYSTEM NOTIFY</div>
+<body>
 
-<div id="app">
-  <div class="hud-bar">
-    <div style="font-family:'Space Mono'; font-size:0.7rem;">LVL <span id="lvl-num">1</span></div>
-    <div id="status-tag" style="color:var(--accent); font-size:0.7rem; font-weight:800;">JARVIS_ACTIVE</div>
-  </div>
+<div class="hud">
+  <div>LVL <span id="lvl">1</span></div>
+  <div id="status">ADAPTIVE CORE</div>
+</div>
 
-  <div id="menu-screen" class="screen active">
-    <div class="card">
-      <h1 style="font-size: 3rem; font-weight: 800; letter-spacing: -2px;">S.T.A.R.K.</h1>
-      <div class="xp-bar"><div id="xp-fill" style="width: 0%"></div></div>
-      <p id="rank-text" style="font-size: 0.6rem; color: var(--gold); margin-bottom: 20px;">RANK: RECRUIT</p>
-      
-      <button onclick="startSolo()" style="width:100%;">Initiate Simulation (Solo)</button>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <button onclick="switchScreen('lb-screen')">Ranks</button>
-        <button onclick="switchScreen('settings-screen')">Settings</button>
-      </div>
-      <button onclick="switchScreen('multi-screen')" style="width:100%; margin-top:10px; border-style:dashed;">Multiplayer Uplink</button>
-    </div>
-  </div>
+<div id="toast"></div>
 
-  <div id="game-screen" class="screen">
-    <div class="card" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
-      <div id="q-count" style="font-family:'Space Mono'; color:var(--accent); margin-bottom:20px;">01/20</div>
-      <h2 id="q-text" style="font-size: 1.8rem; margin-bottom: 40px;">...</h2>
-      
-      <div id="game-btns" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <button onclick="processAnswer(1)" style="border-color:var(--green); color:var(--green);">YES</button>
-        <button onclick="processAnswer(0)" style="border-color:var(--red); color:var(--red);">NO</button>
-        <button onclick="processAnswer(0.5)" style="grid-column: span 2; border-color:var(--gold); color:var(--gold);">MAYBE / SOMETIMES</button>
-      </div>
-      <button id="reset-btn" style="display:none; margin-top:20px;" onclick="location.reload()">Return to Menu</button>
-    </div>
-  </div>
-
-  <div id="lb-screen" class="screen">
-    <div class="card">
-      <h2 style="margin-bottom:20px;">GLOBAL_STATS</h2>
-      <div id="lb-content">
-        </div>
-      <button onclick="switchScreen('menu-screen')" style="margin-top:20px;">Close</button>
-    </div>
-  </div>
-
-  <div id="settings-screen" class="screen">
-    <div class="card">
-      <h2 style="margin-bottom:20px;">HUD_CONFIG</h2>
-      <label style="font-size:0.7rem; color:var(--accent);">VISUAL THEME</label>
-      <select id="theme-select" onchange="changeTheme()" style="width:100%; padding:10px; background:var(--bg); color:white; border:1px solid var(--accent); margin:10px 0;">
-        <option value="default">CYBER BLUE</option>
-        <option value="stark">STARK RED</option>
-        <option value="stealth">STEALTH BLACK</option>
-      </select>
-      <button onclick="clearData()" style="width:100%; border-color:var(--red); color:var(--red); font-size:0.6rem;">Wipe All Data</button>
-      <button onclick="switchScreen('menu-screen')" style="margin-top:auto;">Save & Exit</button>
-    </div>
+<!-- MENU -->
+<div id="menu" class="screen active">
+  <div class="card">
+    <h1>S.T.A.R.K.</h1>
+    <div class="bar"><div id="xpbar" class="fill"></div></div>
+    <button onclick="start()">START</button>
+    <button onclick="show('stats')">STATS</button>
   </div>
 </div>
 
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="card">
+    <div id="count">01/20</div>
+
+    <div id="q" class="big">...</div>
+
+    <div class="bar"><div id="confidence" class="conf"></div></div>
+
+    <div class="grid">
+      <button class="y" onclick="ans(1)">YES</button>
+      <button class="n" onclick="ans(0)">NO</button>
+      <button class="m" onclick="ans(0.5)">MAYBE</button>
+    </div>
+
+    <button id="restart" onclick="location.reload()" style="display:none;">MENU</button>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div id="learn" class="screen">
+  <div class="card">
+    <h2>AI LEARNING MODE</h2>
+    <input id="newWord" placeholder="What was your object?">
+    <input id="newTag" placeholder="Give ONE keyword (e.g. furry, metal)">
+    <button onclick="saveNew()">SAVE</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="stats" class="screen">
+  <div class="card">
+    <h2>DATA</h2>
+    <p>Wins: <span id="wins"></span></p>
+    <p>XP: <span id="xp"></span></p>
+    <button onclick="show('menu')">BACK</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-/* ━━━━━━━━ ENHANCED DATA ━━━━━━━━ */
-const KB = [
-  { w: "DOG", t: ["alive", "pet", "furry", "bark", "mammal"] },
-  { w: "CAT", t: ["alive", "pet", "furry", "meow", "mammal"] },
-  { w: "HAMSTER", t: ["alive", "pet", "furry", "small", "mammal"] },
-  { w: "LION", t: ["alive", "wild", "furry", "huge", "mammal"] },
-  { w: "EAGLE", t: ["alive", "wild", "feathers", "fly", "bird"] },
-  { w: "SHARK", t: ["alive", "wild", "water", "scary", "fish"] },
-  { w: "CAR", t: ["object", "metal", "transport", "wheels", "fast"] },
-  { w: "PHONE", t: ["object", "electronic", "small", "screen", "pocket"] },
-  { w: "PIZZA", t: ["edible", "round", "cheese", "hot", "food"] },
-  { w: "CAKE", t: ["edible", "sweet", "celebration", "food"] },
-  // ... Imagine 500+ entries here
+
+/* ━━━━━━━━━━━ KNOWLEDGE BASE ━━━━━━━━━━━ */
+let KB = JSON.parse(localStorage.getItem('stark_kb')) || [
+  {w:"DOG",t:["alive","pet","furry"]},
+  {w:"CAR",t:["object","metal","fast"]},
+  {w:"PHONE",t:["object","electronic","small"]},
+  {w:"PIZZA",t:["food","edible","round"]}
 ];
 
+let MEMORY = JSON.parse(localStorage.getItem('stark_memory')) || [];
+
+/* QUESTIONS */
 const QUESTIONS = [
-  { q: "Is it a living organism?", t: "alive" },
-  { q: "Is it an inanimate object?", t: "object" },
-  { q: "Can it fly?", t: "fly" },
-  { q: "Does it live in water?", t: "water" },
-  { q: "Is it an electronic device?", t: "electronic" },
-  { q: "Is it bigger than a human?", t: "huge" },
-  { q: "Is it something you can eat?", t: "edible" },
-  { q: "Does it have fur?", t: "furry" }
+  {q:"Is it alive?",t:"alive"},
+  {q:"Is it an object?",t:"object"},
+  {q:"Is it edible?",t:"food"},
+  {q:"Does it use electricity?",t:"electronic"},
+  {q:"Is it furry?",t:"furry"},
+  {q:"Is it fast?",t:"fast"},
+  {q:"Is it small?",t:"small"},
+  {q:"Is it man-made?",t:"metal"}
 ];
 
-let state = {
-  candidates: [],
+/* STATE */
+let S = {
+  scores: [],
   asked: [],
-  qIndex: 1,
+  qNum: 1,
   currentTag: "",
-  xp: parseInt(localStorage.getItem('stark_xp')) || 0,
-  wins: parseInt(localStorage.getItem('stark_wins')) || 0
+  xp: +localStorage.stark_xp || 0,
+  wins: +localStorage.stark_wins || 0,
+  peer: null,
+  conn: null,
+  multiplayer: false
 };
 
-/* ━━━━━━━━ GAME LOGIC ━━━━━━━━ */
-function startSolo() {
-  state.candidates = [...KB];
-  state.asked = [];
-  state.qIndex = 1;
-  switchScreen('game-screen');
-  updateHUD();
-  nextQ();
+/* ━━━━━━━━━━━ START ━━━━━━━━━━━ */
+function start() {
+  S.scores = KB.map(() => 1);
+  S.asked = [];
+  S.qNum = 1;
+
+  document.getElementById('status').innerText = "SCANNING";
+  resetRing();
+
+  show("game");
+  next();
 }
 
-function nextQ() {
-  // BOT IMPROVEMENT: Don't guess too early!
-  // If only one candidate left OR 20 questions reached
-  if (state.candidates.length === 1 || state.qIndex > 20) {
-    reveal();
-    return;
-  }
+/* ━━━━━━━━━━━ QUESTION SELECTION (INFO GAIN) ━━━━━━━━━━━ */
+function next() {
+  if(S.qNum > 20) return reveal();
 
-  // Find best question (Splits candidates in half most effectively)
-  let bestQ = null;
-  let bestScore = Infinity;
+  let best = null;
+  let bestEntropy = -Infinity;
 
   QUESTIONS.forEach(q => {
-    if (state.asked.includes(q.t)) return;
-    let yesCount = state.candidates.filter(c => c.t.includes(q.t)).length;
-    let score = Math.abs(yesCount - (state.candidates.length / 2));
-    if (score < bestScore) {
-      bestScore = score;
-      bestQ = q;
+    if(S.asked.includes(q.t)) return;
+
+    let yes = 0, no = 0;
+
+    KB.forEach((obj,i)=>{
+      if(obj.t.includes(q.t)) yes += S.scores[i];
+      else no += S.scores[i];
+    });
+
+    let total = yes + no;
+    if(total === 0) return;
+
+    let pYes = yes / total;
+    let pNo = no / total;
+
+    let entropy = -(pYes*Math.log2(pYes||1) + pNo*Math.log2(pNo||1));
+
+    if(entropy > bestEntropy){
+      bestEntropy = entropy;
+      best = q;
     }
   });
 
-  if (bestQ) {
-    state.currentTag = bestQ.t;
-    document.getElementById('q-text').innerText = bestQ.q;
-    document.getElementById('q-count').innerText = `${state.qIndex.toString().padStart(2, '0')}/20`;
+  if(!best) return reveal();
+
+  S.currentTag = best.t;
+
+  q_text.innerText = best.q;
+  count.innerText = String(S.qNum).padStart(2,"0") + "/20";
+
+  updateStatus();
+}
+
+/* ━━━━━━━━━━━ ANSWER HANDLER (WEIGHTED AI) ━━━━━━━━━━━ */
+function ans(v) {
+  S.asked.push(S.currentTag);
+
+  KB.forEach((obj,i)=>{
+    let has = obj.t.includes(S.currentTag);
+
+    if(v === 1){
+      S.scores[i] *= has ? 1.5 : 0.3;
+    }
+    else if(v === 0){
+      S.scores[i] *= has ? 0.3 : 1.5;
+    }
+    else{
+      S.scores[i] *= has ? 1.1 : 0.9;
+    }
+  });
+
+  normalizeScores();
+  updateConfidence();
+
+  if(S.multiplayer && S.conn){
+    S.conn.send({type:"answer", value:v});
+  }
+
+  S.qNum++;
+  next();
+}
+
+/* NORMALIZE */
+function normalizeScores(){
+  let max = Math.max(...S.scores);
+  if(max === 0) return;
+  S.scores = S.scores.map(s => s / max);
+}
+
+/* ━━━━━━━━━━━ CONFIDENCE SYSTEM ━━━━━━━━━━━ */
+function updateConfidence(){
+  let max = Math.max(...S.scores);
+  let second = [...S.scores].sort((a,b)=>b-a)[1] || 0;
+
+  let confidence = max - second;
+
+  conf_ring.style.strokeDashoffset = 440 - (440 * confidence);
+}
+
+/* ━━━━━━━━━━━ REVEAL ━━━━━━━━━━━ */
+function reveal(){
+  let bestIndex = S.scores.indexOf(Math.max(...S.scores));
+  let guess = KB[bestIndex]?.w || "UNKNOWN";
+
+  q_text.innerHTML = `<span style="color:var(--accent)">TARGET LOCK:</span><br>${guess}`;
+
+  document.getElementById('controls').style.display = "none";
+  document.getElementById('restart').style.display = "block";
+
+  if(Math.max(...S.scores) > 0.8){
+    awardWin();
   } else {
-    reveal();
+    MEMORY.push({failed:true, time:Date.now()});
+    localStorage.setItem('stark_memory', JSON.stringify(MEMORY));
   }
+
+  document.getElementById('status').innerText = "LOCKED";
 }
 
-function processAnswer(val) {
-  state.asked.push(state.currentTag);
-  
-  if (val === 1) {
-    state.candidates = state.candidates.filter(c => c.t.includes(state.currentTag));
-  } else if (val === 0) {
-    state.candidates = state.candidates.filter(c => !c.t.includes(state.currentTag));
-  }
-  
-  state.qIndex++;
-  nextQ();
+/* ━━━━━━━━━━━ MULTIPLAYER ━━━━━━━━━━━ */
+function hostGame(){
+  S.peer = new Peer();
+  S.peer.on('open', id=>{
+    notify("HOST ID: " + id);
+  });
+
+  S.peer.on('connection', conn=>{
+    S.conn = conn;
+    S.multiplayer = true;
+
+    conn.on('data', data=>{
+      if(data.type==="answer"){
+        ans(data.value);
+      }
+    });
+  });
 }
 
-function reveal() {
-  const result = state.candidates.length > 0 ? state.candidates[0].w : "OUTSIDE MY DATABASE";
-  document.getElementById('q-text').innerHTML = `ANALYSIS COMPLETE:<br><span style="color:var(--accent)">${result}</span>`;
-  document.getElementById('game-btns').style.display = 'none';
-  document.getElementById('reset-btn').style.display = 'block';
-  
-  if(state.candidates.length > 0) {
-    addXP(50);
-    state.wins++;
-    localStorage.setItem('stark_wins', state.wins);
-  }
+function joinGame(id){
+  S.peer = new Peer();
+
+  S.conn = S.peer.connect(id);
+  S.multiplayer = true;
+
+  S.conn.on('open', ()=>{
+    notify("CONNECTED");
+  });
 }
 
-/* ━━━━━━━━ SYSTEM ━━━━━━━━ */
-function addXP(amt) {
-  state.xp += amt;
-  localStorage.setItem('stark_xp', state.xp);
+/* ━━━━━━━━━━━ SYSTEM ━━━━━━━━━━━ */
+function awardWin(){
+  S.xp += 50;
+  S.wins++;
+
+  localStorage.stark_xp = S.xp;
+  localStorage.stark_wins = S.wins;
+
   updateHUD();
-  notify(`+${amt} XP EARNED`);
+  notify("+50 XP");
 }
 
-function updateHUD() {
-  const lvl = Math.floor(state.xp / 500) + 1;
-  const progress = ((state.xp % 500) / 500) * 100;
-  document.getElementById('lvl-num').innerText = lvl;
-  document.getElementById('xp-fill').style.width = progress + "%";
-  
-  const ranks = ["INTERN", "RECRUIT", "AGENT", "AVENGER", "DIRECTOR"];
-  document.getElementById('rank-text').innerText = `RANK: ${ranks[Math.min(lvl-1, 4)]}`;
+function updateHUD(){
+  let lvl = Math.floor(S.xp/500)+1;
 
-  // Update Leaderboard Screen
-  document.getElementById('lb-content').innerHTML = `
-    <div class="lb-row"><span>WINS</span><span>${state.wins}</span></div>
-    <div class="lb-row"><span>TOTAL XP</span><span>${state.xp}</span></div>
-    <div class="lb-row"><span>CLEARANCE</span><span>LVL ${lvl}</span></div>
-  `;
+  lvl_display.innerText = lvl;
+  xp_bar.style.width = (S.xp%500)/5 + "%";
+
+  wins_display.innerText = S.wins;
+  xp_display.innerText = S.xp;
 }
 
-function changeTheme() {
-  const theme = document.getElementById('theme-select').value;
-  document.body.className = 'theme-' + theme;
-  localStorage.setItem('stark_theme', theme);
+function updateStatus(){
+  if(S.qNum < 5) status.innerText = "SCANNING";
+  else if(S.qNum < 12) status.innerText = "NARROWING";
+  else status.innerText = "TARGETING";
 }
 
-function switchScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function resetRing(){
+  conf_ring.style.strokeDashoffset = 440;
+}
+
+function notify(msg){
+  toast.innerText = "[SYS]: " + msg;
+  toast.style.display="block";
+  setTimeout(()=>toast.style.display="none",2500);
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function notify(msg) {
-  const t = document.getElementById('toast');
-  t.innerText = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
-}
-
-function clearData() {
-  if(confirm("Factory reset all HUD data?")) {
+function clearMemory(){
+  if(confirm("WIPE ALL DATA?")){
     localStorage.clear();
     location.reload();
   }
 }
 
-// Init
-window.onload = () => {
-  updateHUD();
-  const savedTheme = localStorage.getItem('stark_theme');
-  if(savedTheme) {
-    document.body.className = 'theme-' + savedTheme;
-    document.getElementById('theme-select').value = savedTheme;
-  }
-};
+/* INIT */
+updateHUD();
+
 </script>
+
 </body>
 </html>
